@@ -58,7 +58,8 @@ pub fn draw(frame: &mut Frame, app: &App) {
 
     // Word queue preview
     let queue_preview: String = app
-        .typing.word_queue
+        .typing
+        .word_queue
         .iter()
         .take(10)
         .cloned()

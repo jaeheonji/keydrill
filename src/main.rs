@@ -4,10 +4,12 @@ mod layout;
 mod ui;
 mod words;
 
+use std::fs;
 use std::io;
 use std::time::{Duration, Instant};
 
 use anyhow::Result;
+use clap::Parser;
 use crossterm::execute;
 use crossterm::terminal::{
     EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode,
@@ -20,7 +22,39 @@ use app::{App, Screen};
 use event::{AppEvent, is_quit, poll_event};
 use layout::Layout;
 
+#[derive(Parser)]
+#[command(version, about, long_about = None)]
+struct Cli {
+    /// Enable debug mode
+    #[arg(long)]
+    debug: bool,
+}
+
+fn setup_debug_logging() -> Result<()> {
+    use std::os::unix::fs::MetadataExt;
+    let uid = fs::metadata("/proc/self")?.uid();
+    let dir = format!("/tmp/keydrill-{uid}");
+    fs::create_dir_all(&dir)?;
+    let log_path = format!("{dir}/keydrill.log");
+    let log_file = fs::File::create(&log_path)?;
+
+    tracing_subscriber::fmt()
+        .with_writer(log_file)
+        .with_ansi(false)
+        .with_max_level(tracing::Level::DEBUG)
+        .init();
+
+    eprintln!("Debug log: {log_path}");
+    Ok(())
+}
+
 fn main() -> Result<()> {
+    let cli = Cli::parse();
+
+    if cli.debug {
+        setup_debug_logging()?;
+    }
+
     // Terminal setup
     enable_raw_mode()?;
     let mut stdout = io::stdout();

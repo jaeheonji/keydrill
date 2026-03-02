@@ -13,3 +13,5 @@ toml = "1.0.3"
 tachyonfx = "0.25"
 unicode-width = "0.2.2"
 clap = { version = "4.5.60", features = ["derive"] }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.22", features = ["fmt", "env-filter"] }

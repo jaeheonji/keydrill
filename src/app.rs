@@ -179,11 +179,13 @@ impl App {
 
     fn handle_typing_key(&mut self, key: KeyEvent) {
         if key.code == KeyCode::Char('t') && key.modifiers.contains(KeyModifiers::CONTROL) {
+            tracing::debug!("toggled qwerty remap: {}", !self.remap.qwerty_remap);
             self.remap.qwerty_remap = !self.remap.qwerty_remap;
             return;
         }
         match key.code {
             KeyCode::Esc => {
+                tracing::debug!("esc");
                 self.screen = Screen::LevelSelect;
                 self.select.select_screen_entered_at = Instant::now();
                 self.typing.input.clear();
@@ -197,6 +199,13 @@ impl App {
                 } else {
                     c
                 };
+                let expected = self
+                    .typing
+                    .current_word
+                    .chars()
+                    .nth(self.typing.input.len());
+                let correct = expected == Some(c);
+                tracing::debug!(typed = %c, ?expected, correct, word = %self.typing.current_word, "keypress");
                 self.typing.input.push(c);
                 if self.typing.input.len() >= self.typing.current_word.len() {
                     self.score_word();
@@ -204,6 +213,7 @@ impl App {
                 }
             }
             KeyCode::Backspace => {
+                tracing::debug!("backspace");
                 self.typing.input.pop();
             }
             _ => {}
@@ -220,7 +230,8 @@ impl App {
         self.stats.completed_words = 0;
         self.stats.elapsed_on_finish = None;
         self.load_words();
-        self.typing.word_queue = words::shuffled_batch(&self.typing.all_words, self.typing.all_words.len());
+        self.typing.word_queue =
+            words::shuffled_batch(&self.typing.all_words, self.typing.all_words.len());
         self.stats.total_words = self.typing.word_queue.len();
         self.typing.current_word = self.typing.word_queue.remove(0);
     }
@@ -228,13 +239,19 @@ impl App {
     fn load_words(&mut self) {
         let layout = &self.layouts[self.select.current_layout_idx];
         let keys = layout.available_keys_for_level(self.select.current_level);
-        self.typing.all_words = words::build_word_pool(&layout.levels, self.select.current_level, &keys);
+        self.typing.all_words =
+            words::build_word_pool(&layout.levels, self.select.current_level, &keys);
     }
 
     fn score_word(&mut self) {
         let word_len = self.typing.current_word.len();
         self.stats.total_chars += word_len;
-        for (typed, expected) in self.typing.input.chars().zip(self.typing.current_word.chars()) {
+        for (typed, expected) in self
+            .typing
+            .input
+            .chars()
+            .zip(self.typing.current_word.chars())
+        {
             if typed == expected {
                 self.stats.correct_chars += 1;
             }
@@ -245,7 +262,10 @@ impl App {
     fn advance_word(&mut self) {
         if self.typing.word_queue.is_empty() {
             // Session complete
-            self.stats.elapsed_on_finish = self.stats.typing_started_at.map(|t| t.elapsed().as_secs_f64());
+            self.stats.elapsed_on_finish = self
+                .stats
+                .typing_started_at
+                .map(|t| t.elapsed().as_secs_f64());
             self.screen = Screen::Results;
             self.typing.input.clear();
             return;
@@ -266,11 +286,15 @@ impl App {
     }
 
     pub fn available_keys(&self) -> Vec<char> {
-        self.layout().available_keys_for_level(self.select.current_level)
+        self.layout()
+            .available_keys_for_level(self.select.current_level)
     }
 
     pub fn next_expected_char(&self) -> Option<char> {
-        self.typing.current_word.chars().nth(self.typing.input.len())
+        self.typing
+            .current_word
+            .chars()
+            .nth(self.typing.input.len())
     }
 
     pub fn elapsed_secs(&self) -> f64 {
