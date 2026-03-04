@@ -6,6 +6,7 @@ use ratatui::style::{Color, Style};
 use ratatui::widgets::Widget;
 use tachyonfx::color_from_hsl;
 
+use crate::config::theme::Theme;
 use crate::layout::Layout;
 
 const KEY_HEIGHT: u16 = 3;
@@ -462,6 +463,7 @@ pub struct KeyboardWidget<'a> {
     active_keys: &'a [char],
     highlight_key: Option<char>,
     elapsed: Duration,
+    theme: &'a Theme,
 }
 
 impl<'a> KeyboardWidget<'a> {
@@ -470,12 +472,14 @@ impl<'a> KeyboardWidget<'a> {
         active_keys: &'a [char],
         highlight_key: Option<char>,
         elapsed: Duration,
+        theme: &'a Theme,
     ) -> Self {
         Self {
             layout,
             active_keys,
             highlight_key,
             elapsed,
+            theme,
         }
     }
 
@@ -516,7 +520,7 @@ fn border_gradient_color(rect: Rect, x: u16, y: u16, time_secs: f64) -> Color {
 
 impl Widget for KeyboardWidget<'_> {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        let dim_style = Style::default().fg(Color::Indexed(8));
+        let dim_style = Style::default().fg(self.theme.secondary());
         let time_secs = self.elapsed.as_secs_f64();
 
         for pk in PHYSICAL_KEYS {
@@ -542,14 +546,14 @@ impl Widget for KeyboardWidget<'_> {
                     let is_active = self.active_keys.contains(&key.normal);
                     // Key state priority: highlighted > active(wave) > inactive(dim)
                     if is_highlight {
-                        let style = Style::default().fg(Color::Yellow);
+                        let style = Style::default().fg(self.theme.highlight());
                         let mut char_buf = [0u8; 4];
                         let label = key.normal.encode_utf8(&mut char_buf);
                         draw_key_box(buf, rect, label, style, Some(time_secs));
                     } else if is_active {
                         let wave = wave_color(pk.x, time_secs);
                         let label_style = Style::default().fg(wave);
-                        let border_style = Style::default().fg(Color::White);
+                        let border_style = Style::default().fg(self.theme.active_border());
                         let mut char_buf = [0u8; 4];
                         let label = key.normal.encode_utf8(&mut char_buf);
                         draw_key_box(buf, rect, label, border_style, None);

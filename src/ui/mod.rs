@@ -6,11 +6,12 @@ pub mod typing;
 use ratatui::Frame;
 
 use crate::app::{App, Screen};
+use crate::config::theme::Theme;
 
-pub fn draw(frame: &mut Frame, app: &App) {
+pub fn draw(frame: &mut Frame, app: &App, theme: &Theme) {
     match app.screen {
-        Screen::LevelSelect => level_select::draw(frame, app),
-        Screen::Typing => typing::draw(frame, app),
-        Screen::Results => results::draw(frame, app),
+        Screen::LevelSelect => level_select::draw(frame, app, theme),
+        Screen::Typing => typing::draw(frame, app, theme),
+        Screen::Results => results::draw(frame, app, theme),
     }
 }

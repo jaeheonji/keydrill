@@ -72,10 +72,10 @@ impl Layout {
         let mut remap = HashMap::new();
         for (row_idx, row) in qwerty_rows.iter().enumerate() {
             for (col_idx, &qwerty_ch) in row.iter().enumerate() {
-                if let Some(&target_ch) = pos_to_target.get(&(row_idx as u8, col_idx as u8)) {
-                    if qwerty_ch != target_ch {
-                        remap.insert(qwerty_ch, target_ch);
-                    }
+                if let Some(&target_ch) = pos_to_target.get(&(row_idx as u8, col_idx as u8))
+                    && qwerty_ch != target_ch
+                {
+                    remap.insert(qwerty_ch, target_ch);
                 }
             }
         }

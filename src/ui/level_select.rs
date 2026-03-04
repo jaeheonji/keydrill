@@ -7,18 +7,15 @@ use ratatui::widgets::{Block, Borders, List, ListItem, Paragraph};
 use unicode_width::UnicodeWidthChar;
 
 use crate::app::{App, SelectPhase};
+use crate::config::theme::Theme;
 
 const TITLE_ART: &[&str] = &[
-    r" ██ ▄█▀▓█████▓██   ██▓▓█████▄  ██▀███   ██▓ ██▓     ██▓    ",
-    r" ██▄█▒ ▓█   ▀ ▒██  ██▒▒██▀ ██▌▓██ ▒ ██▒▓██▒▓██▒    ▓██▒    ",
-    r"▓███▄░ ▒███    ▒██ ██░░██   █▌▓██ ░▄█ ▒▒██▒▒██░    ▒██░    ",
-    r"▓██ █▄ ▒▓█  ▄  ░ ▐██▓░░▓█▄   ▌▒██▀▀█▄  ░██░▒██░    ▒██░    ",
-    r"▒██▒ █▄░▒████▒ ░ ██▒▓░░▒████▓ ░██▓ ▒██▒░██░░██████▒░██████▒",
-    r"▒ ▒▒ ▓▒░░ ▒░ ░  ██▒▒▒  ▒▒▓  ▒ ░ ▒▓ ░▒▓░░▓  ░ ▒░▓  ░░ ▒░▓  ░",
-    r"░ ░▒ ▒░ ░ ░  ░▓██ ░▒░  ░ ▒  ▒   ░▒ ░ ▒░ ▒ ░░ ░ ▒  ░░ ░ ▒  ░",
-    r"░ ░░ ░    ░   ▒ ▒ ░░   ░ ░  ░   ░░   ░  ▒ ░  ░ ░     ░ ░   ",
-    r"░  ░      ░  ░░ ░        ░       ░      ░      ░  ░    ░  ░  ",
-    r"               ░ ░      ░                                     ",
+    "██╗  ██╗███████╗██╗   ██╗██████╗ ██████╗ ██╗██╗     ██╗     ",
+    "██║ ██╔╝██╔════╝╚██╗ ██╔╝██╔══██╗██╔══██╗██║██║     ██║     ",
+    "█████╔╝ █████╗   ╚████╔╝ ██║  ██║██████╔╝██║██║     ██║     ",
+    "██╔═██╗ ██╔══╝    ╚██╔╝  ██║  ██║██╔══██╗██║██║     ██║     ",
+    "██║  ██╗███████╗   ██║   ██████╔╝██║  ██║██║███████╗███████╗",
+    "╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═════╝ ╚═╝  ╚═╝╚═╝╚══════╝╚══════╝",
 ];
 
 const TITLE_ART_HEIGHT: u16 = TITLE_ART.len() as u16;
@@ -26,14 +23,14 @@ const BOX_WIDTH: u16 = 50;
 
 const SLIDE_DURATION_MS: f64 = 800.0;
 
-pub fn draw(frame: &mut Frame, app: &App) {
+pub fn draw(frame: &mut Frame, app: &App, theme: &Theme) {
     let area = frame.area();
     let elapsed_ms = app.select.select_screen_entered_at.elapsed().as_secs_f64() * 1000.0;
 
     // Build the list items to determine box height
     let (items, title, help_text) = match app.select.select_phase {
-        SelectPhase::Layout => build_layout_items(app),
-        SelectPhase::Level => build_level_items(app),
+        SelectPhase::Layout => build_layout_items(app, theme),
+        SelectPhase::Level => build_level_items(app, theme),
     };
 
     let item_count = items.len() as u16;
@@ -57,7 +54,7 @@ pub fn draw(frame: &mut Frame, app: &App) {
     .areas(content_area);
 
     // ASCII art title — direct buffer rendering with animation
-    render_title_animated(frame.buffer_mut(), title_area, elapsed_ms);
+    render_title_animated(frame.buffer_mut(), title_area, elapsed_ms, theme.title());
 
     // Centered box
     let [box_centered] = Layout::horizontal([Constraint::Length(BOX_WIDTH)])
@@ -74,7 +71,7 @@ pub fn draw(frame: &mut Frame, app: &App) {
     // Help text
     let help = Paragraph::new(help_text)
         .alignment(Alignment::Center)
-        .style(Style::default().fg(Color::Indexed(8)));
+        .style(Style::default().fg(theme.secondary()));
     frame.render_widget(help, help_area);
 }
 
@@ -84,7 +81,7 @@ fn ease_out_cubic(t: f64) -> f64 {
     1.0 - (1.0 - t).powi(3)
 }
 
-fn render_title_animated(buf: &mut Buffer, area: Rect, elapsed_ms: f64) {
+fn render_title_animated(buf: &mut Buffer, area: Rect, elapsed_ms: f64, color: Color) {
     // Vertical slide-in: from below upward
     let slide_offset_y: i32 = if elapsed_ms < SLIDE_DURATION_MS {
         let progress = ease_out_cubic(elapsed_ms / SLIDE_DURATION_MS);
@@ -93,8 +90,6 @@ fn render_title_animated(buf: &mut Buffer, area: Rect, elapsed_ms: f64) {
     } else {
         0
     };
-
-    let color = Color::Indexed(4);
 
     for (row_idx, line) in TITLE_ART.iter().enumerate() {
         let target_y = area.y as i32 + row_idx as i32 + slide_offset_y;
@@ -132,7 +127,7 @@ fn render_title_animated(buf: &mut Buffer, area: Rect, elapsed_ms: f64) {
     }
 }
 
-fn build_layout_items(app: &App) -> (Vec<ListItem<'static>>, &'static str, &'static str) {
+fn build_layout_items<'a>(app: &App, theme: &Theme) -> (Vec<ListItem<'a>>, &'static str, &'static str) {
     let items: Vec<ListItem> = app
         .layouts
         .iter()
@@ -143,7 +138,7 @@ fn build_layout_items(app: &App) -> (Vec<ListItem<'static>>, &'static str, &'sta
             let content = format!("{prefix}{}", layout.name);
             let style = if selected {
                 Style::default()
-                    .fg(Color::Indexed(3))
+                    .fg(theme.selected())
                     .add_modifier(Modifier::BOLD)
             } else {
                 Style::default().fg(Color::Reset)
@@ -159,7 +154,7 @@ fn build_layout_items(app: &App) -> (Vec<ListItem<'static>>, &'static str, &'sta
     )
 }
 
-fn build_level_items(app: &App) -> (Vec<ListItem<'static>>, &'static str, &'static str) {
+fn build_level_items<'a>(app: &App, theme: &Theme) -> (Vec<ListItem<'a>>, &'static str, &'static str) {
     let layout = app.layout();
     let items: Vec<ListItem> = layout
         .levels
@@ -172,7 +167,7 @@ fn build_level_items(app: &App) -> (Vec<ListItem<'static>>, &'static str, &'stat
             let content = format!("{prefix}{}. {} [{keys_str}]", i + 1, level.name);
             let style = if selected {
                 Style::default()
-                    .fg(Color::Indexed(3))
+                    .fg(theme.selected())
                     .add_modifier(Modifier::BOLD)
             } else {
                 Style::default().fg(Color::Reset)

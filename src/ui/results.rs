@@ -5,8 +5,9 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::Paragraph;
 
 use crate::app::App;
+use crate::config::theme::Theme;
 
-pub fn draw(frame: &mut Frame, app: &App) {
+pub fn draw(frame: &mut Frame, app: &App, theme: &Theme) {
     let elapsed = app.elapsed_secs();
     let wpm = if elapsed > 0.0 {
         (app.stats.total_chars as f64 / 5.0) / (elapsed / 60.0)
@@ -21,7 +22,7 @@ pub fn draw(frame: &mut Frame, app: &App) {
     let minutes = (elapsed as u64) / 60;
     let seconds = (elapsed as u64) % 60;
 
-    let dim = Style::default().fg(Color::Indexed(8));
+    let dim = Style::default().fg(theme.secondary());
     let val = Style::default().fg(Color::Reset);
 
     let chunks = Layout::vertical([

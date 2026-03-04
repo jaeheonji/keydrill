@@ -28,3 +28,25 @@ pub fn is_quit(key: &KeyEvent) -> bool {
         }
     )
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crossterm::event::KeyEventKind;
+
+    fn key(code: KeyCode, modifiers: KeyModifiers) -> KeyEvent {
+        KeyEvent::new_with_kind(code, modifiers, KeyEventKind::Press)
+    }
+
+    #[test]
+    fn ctrl_c_is_quit() {
+        assert!(is_quit(&key(KeyCode::Char('c'), KeyModifiers::CONTROL)));
+    }
+
+    #[test]
+    fn regular_keys_are_not_quit() {
+        assert!(!is_quit(&key(KeyCode::Char('c'), KeyModifiers::NONE)));
+        assert!(!is_quit(&key(KeyCode::Char('q'), KeyModifiers::NONE)));
+        assert!(!is_quit(&key(KeyCode::Esc, KeyModifiers::NONE)));
+    }
+}

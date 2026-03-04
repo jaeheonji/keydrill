@@ -1,11 +1,14 @@
 mod app;
+mod config;
 mod event;
 mod layout;
 mod ui;
+mod utils;
 mod words;
 
 use std::fs;
 use std::io;
+use std::path::PathBuf;
 use std::time::{Duration, Instant};
 
 use anyhow::Result;
@@ -19,6 +22,7 @@ use ratatui::backend::CrosstermBackend;
 use tachyonfx::{EffectManager, Interpolation, fx};
 
 use app::{App, Screen};
+use config::Config;
 use event::{AppEvent, is_quit, poll_event};
 use layout::Layout;
 
@@ -28,6 +32,10 @@ struct Cli {
     /// Enable debug mode
     #[arg(long)]
     debug: bool,
+
+    /// Path to config file
+    #[arg(long)]
+    config: Option<PathBuf>,
 }
 
 fn setup_debug_logging() -> Result<()> {
@@ -55,6 +63,8 @@ fn main() -> Result<()> {
         setup_debug_logging()?;
     }
 
+    let config = Config::load(cli.config)?;
+
     // Terminal setup
     enable_raw_mode()?;
     let mut stdout = io::stdout();
@@ -62,7 +72,7 @@ fn main() -> Result<()> {
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
 
-    let result = run(&mut terminal);
+    let result = run(&mut terminal, &config);
 
     // Terminal restore
     disable_raw_mode()?;
@@ -71,8 +81,8 @@ fn main() -> Result<()> {
     result
 }
 
-fn run(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> Result<()> {
-    let mut app = App::new(Layout::discover_all());
+fn run(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>, config: &Config) -> Result<()> {
+    let mut app = App::new(Layout::discover_all(&config.general.layouts), config);
     let mut effects: EffectManager<()> = EffectManager::default();
     let mut last_frame = Instant::now();
 
@@ -81,7 +91,7 @@ fn run(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> Result<()> {
         last_frame = Instant::now();
 
         terminal.draw(|frame| {
-            ui::draw(frame, &app);
+            ui::draw(frame, &app, &config.theme);
             let area = frame.area();
             effects.process_effects(elapsed.into(), frame.buffer_mut(), area);
         })?;

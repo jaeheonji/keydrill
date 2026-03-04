@@ -1,0 +1,128 @@
+name = "Colemak-DH"
+
+# Keys
+keys = [
+    # Row 0: Number row
+    { row = 0, col = 0,  normal = "`", shifted = "~" },
+    { row = 0, col = 1,  normal = "1", shifted = "!" },
+    { row = 0, col = 2,  normal = "2", shifted = "@" },
+    { row = 0, col = 3,  normal = "3", shifted = "#" },
+    { row = 0, col = 4,  normal = "4", shifted = "$" },
+    { row = 0, col = 5,  normal = "5", shifted = "%" },
+    { row = 0, col = 6,  normal = "6", shifted = "^" },
+    { row = 0, col = 7,  normal = "7", shifted = "&" },
+    { row = 0, col = 8,  normal = "8", shifted = "*" },
+    { row = 0, col = 9,  normal = "9", shifted = "(" },
+    { row = 0, col = 10, normal = "0", shifted = ")" },
+    { row = 0, col = 11, normal = "-", shifted = "_" },
+    { row = 0, col = 12, normal = "=", shifted = "+" },
+    # Row 1: Top row
+    { row = 1, col = 0, normal = "q", shifted = "Q" },
+    { row = 1, col = 1, normal = "w", shifted = "W" },
+    { row = 1, col = 2, normal = "f", shifted = "F" },
+    { row = 1, col = 3, normal = "p", shifted = "P" },
+    { row = 1, col = 4, normal = "b", shifted = "B" },
+    { row = 1, col = 5, normal = "j", shifted = "J" },
+    { row = 1, col = 6, normal = "l", shifted = "L" },
+    { row = 1, col = 7, normal = "u", shifted = "U" },
+    { row = 1, col = 8, normal = "y", shifted = "Y" },
+    { row = 1, col = 9, normal = ";" },
+    # Row 2: Home row
+    { row = 2, col = 0,  normal = "a", shifted = "A" },
+    { row = 2, col = 1,  normal = "r", shifted = "R" },
+    { row = 2, col = 2,  normal = "s", shifted = "S" },
+    { row = 2, col = 3,  normal = "t", shifted = "T" },
+    { row = 2, col = 4,  normal = "g", shifted = "G" },
+    { row = 2, col = 5,  normal = "m", shifted = "M" },
+    { row = 2, col = 6,  normal = "n", shifted = "N" },
+    { row = 2, col = 7,  normal = "e", shifted = "E" },
+    { row = 2, col = 8,  normal = "i", shifted = "I" },
+    { row = 2, col = 9,  normal = "o", shifted = "O" },
+    { row = 2, col = 10, normal = "'" },
+    # Row 3: Bottom row
+    { row = 3, col = 0, normal = "z", shifted = "Z" },
+    { row = 3, col = 1, normal = "x", shifted = "X" },
+    { row = 3, col = 2, normal = "c", shifted = "C" },
+    { row = 3, col = 3, normal = "d", shifted = "D" },
+    { row = 3, col = 4, normal = "v", shifted = "V" },
+    { row = 3, col = 5, normal = "k", shifted = "K" },
+    { row = 3, col = 6, normal = "h", shifted = "H" },
+    { row = 3, col = 7, normal = ",", shifted = "<" },
+    { row = 3, col = 8, normal = ".", shifted = ">" },
+    { row = 3, col = 9, normal = "/", shifted = "?" },
+]
+
+# Levels
+[[levels]]
+name = "Home Row (Left)"
+new_keys = ["a", "r", "s", "t"]
+words = ["art", "rat", "star", "tart", "start", "sat", "tar", "at", "as", "a"]
+
+[[levels]]
+name = "Home Row (Right)"
+new_keys = ["n", "e", "i", "o"]
+words = [
+    "ten", "net", "set", "rest", "nest", "test", "sent", "rent",
+    "in", "it", "its", "sit", "sin", "tin", "nine", "tie", "tire",
+    "site", "stein", "inert", "stern", "insert", "risen",
+]
+
+[[levels]]
+name = "Home Row (Full)"
+new_keys = ["g", "m"]
+words = [
+    "game", "gate", "grain", "grant", "great", "grin", "grit", "grime",
+    "main", "man", "mast", "mate", "mean", "meet", "mine", "mint",
+    "mist", "more", "moisten", "name", "magnet", "margin", "might",
+]
+
+[[levels]]
+name = "Top Row (Left)"
+new_keys = ["q", "w", "f", "p", "b"]
+words = [
+    "want", "water", "wait", "was", "war", "wash", "what", "white",
+    "wide", "wife", "win", "with", "winter", "wish", "wire", "wise",
+    "fit", "first", "find", "fire", "fast", "far", "few", "free",
+    "fresh", "pant", "part", "past", "path", "pin", "pint", "print",
+    "quest", "quiet", "quit", "quite",
+    "ban", "bat", "best", "big", "bit", "born", "bone", "burn", "bring",
+]
+
+[[levels]]
+name = "Top Row (Right)"
+new_keys = ["j", "l", "u", "y"]
+words = [
+    "just", "jet", "jut", "jungle", "judge", "june",
+    "lift", "light", "line", "list", "little", "lung", "lust",
+    "until", "useful", "unit", "unique", "upper", "usual",
+    "yes", "yet", "yield",
+]
+
+[[levels]]
+name = "Bottom Row (Left)"
+new_keys = ["z", "x", "c", "d", "v"]
+words = [
+    "size", "zero", "zone", "zinc", "zest",
+    "next", "exist", "extra", "exact", "except", "exit", "context",
+    "citizen", "can", "cut", "cup", "cause", "cent", "center",
+    "certain", "chance", "change", "charge", "circle",
+    "dig", "dine", "dirt", "disc", "done", "drift", "dust",
+    "van", "vast", "visit", "vital", "give", "live", "ever", "even",
+]
+
+[[levels]]
+name = "Bottom Row (Right)"
+new_keys = ["k", "h"]
+words = [
+    "king", "kind", "keep", "knee", "kill", "kit", "kitchen", "kick",
+    "the", "that", "this", "then", "than", "their", "there", "these",
+    "thin", "hand", "hard", "head", "heat", "hint", "hit", "his",
+]
+
+[[levels]]
+name = "Punctuation"
+new_keys = [",", ".", "/", ";", "'"]
+words = [
+    "it's", "that's", "there's", "what's", "can't",
+    "didn't", "don't", "isn't", "hasn't", "won't",
+]

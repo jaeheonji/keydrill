@@ -3,6 +3,7 @@ use std::time::Instant;
 
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
+use crate::config::Config;
 use crate::layout::Layout;
 use crate::words;
 
@@ -14,7 +15,7 @@ pub enum Screen {
     Results,
 }
 
-#[derive(Default, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub enum SelectPhase {
     #[default]
     Layout,
@@ -94,13 +95,13 @@ impl Default for App {
 }
 
 impl App {
-    pub fn new(layouts: Vec<Layout>) -> Self {
+    pub fn new(layouts: Vec<Layout>, config: &Config) -> Self {
         let qwerty_remap_table = layouts[0].build_qwerty_remap();
         Self {
             layouts,
             remap: RemapState {
+                qwerty_remap: config.general.qwerty_remap,
                 qwerty_remap_table,
-                ..RemapState::default()
             },
             ..Self::default()
         }
@@ -305,5 +306,206 @@ impl App {
         } else {
             0.0
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crossterm::event::KeyEventKind;
+
+    fn test_app() -> App {
+        let layouts = crate::layout::Layout::discover_all(&[]);
+        let config = Config::default();
+        App::new(layouts, &config)
+    }
+
+    fn key(code: KeyCode) -> KeyEvent {
+        KeyEvent::new_with_kind(code, KeyModifiers::NONE, KeyEventKind::Press)
+    }
+
+    fn ctrl_key(c: char) -> KeyEvent {
+        KeyEvent::new_with_kind(KeyCode::Char(c), KeyModifiers::CONTROL, KeyEventKind::Press)
+    }
+
+    // -- Level select navigation --
+
+    #[test]
+    fn initial_screen_is_level_select() {
+        let app = test_app();
+        assert!(matches!(app.screen, Screen::LevelSelect));
+        assert_eq!(app.select.select_phase, SelectPhase::Layout);
+    }
+
+    #[test]
+    fn enter_selects_layout_and_moves_to_level_phase() {
+        let mut app = test_app();
+        app.handle_key(key(KeyCode::Enter));
+        assert_eq!(app.select.select_phase, SelectPhase::Level);
+    }
+
+    #[test]
+    fn esc_on_layout_phase_quits() {
+        let mut app = test_app();
+        app.handle_key(key(KeyCode::Esc));
+        assert!(app.should_quit);
+    }
+
+    #[test]
+    fn esc_on_level_phase_with_single_layout_quits() {
+        let mut app = test_app();
+        // Force single layout
+        app.layouts.truncate(1);
+        app.select.select_phase = SelectPhase::Level;
+        app.handle_key(key(KeyCode::Esc));
+        assert!(app.should_quit);
+    }
+
+    #[test]
+    fn esc_on_level_phase_with_multiple_layouts_goes_to_layout_phase() {
+        let mut app = test_app();
+        // Ensure multiple layouts
+        let extra = app.layouts[0].clone();
+        app.layouts.push(extra);
+        app.select.select_phase = SelectPhase::Level;
+        app.handle_key(key(KeyCode::Esc));
+        assert!(!app.should_quit);
+        assert_eq!(app.select.select_phase, SelectPhase::Layout);
+    }
+
+    #[test]
+    fn level_navigation_clamps() {
+        let mut app = test_app();
+        app.handle_key(key(KeyCode::Enter)); // → level phase
+        // Already at 0, up shouldn't underflow
+        app.handle_key(key(KeyCode::Up));
+        assert_eq!(app.select.current_level, 0);
+        // Move down then back up
+        app.handle_key(key(KeyCode::Down));
+        assert_eq!(app.select.current_level, 1);
+        app.handle_key(key(KeyCode::Up));
+        assert_eq!(app.select.current_level, 0);
+    }
+
+    // -- Typing --
+
+    #[test]
+    fn enter_on_level_starts_typing() {
+        let mut app = test_app();
+        app.handle_key(key(KeyCode::Enter)); // → level phase
+        app.handle_key(key(KeyCode::Enter)); // → typing
+        assert!(matches!(app.screen, Screen::Typing));
+        assert!(!app.typing.current_word.is_empty());
+    }
+
+    #[test]
+    fn typing_correct_chars_advances() {
+        let mut app = test_app();
+        app.handle_key(key(KeyCode::Enter));
+        app.handle_key(key(KeyCode::Enter));
+
+        let word = app.typing.current_word.clone();
+        // Type the full word correctly
+        for ch in word.chars() {
+            app.handle_key(key(KeyCode::Char(ch)));
+        }
+        // Should have advanced to next word or results
+        assert_ne!(app.typing.current_word, word);
+    }
+
+    #[test]
+    fn backspace_removes_input() {
+        let mut app = test_app();
+        app.handle_key(key(KeyCode::Enter));
+        app.handle_key(key(KeyCode::Enter));
+
+        app.handle_key(key(KeyCode::Char('x')));
+        assert_eq!(app.typing.input.len(), 1);
+        app.handle_key(key(KeyCode::Backspace));
+        assert!(app.typing.input.is_empty());
+    }
+
+    #[test]
+    fn esc_during_typing_returns_to_level_select() {
+        let mut app = test_app();
+        app.handle_key(key(KeyCode::Enter));
+        app.handle_key(key(KeyCode::Enter));
+        app.handle_key(key(KeyCode::Esc));
+        assert!(matches!(app.screen, Screen::LevelSelect));
+    }
+
+    // -- Scoring --
+
+    #[test]
+    fn score_word_counts_correctly() {
+        let mut app = test_app();
+        app.typing.current_word = "abc".into();
+        app.typing.input = "abc".into();
+        app.score_word();
+        assert_eq!(app.stats.total_chars, 3);
+        assert_eq!(app.stats.correct_chars, 3);
+        assert_eq!(app.stats.completed_words, 1);
+    }
+
+    #[test]
+    fn score_word_counts_mismatches() {
+        let mut app = test_app();
+        app.typing.current_word = "abc".into();
+        app.typing.input = "axc".into();
+        app.score_word();
+        assert_eq!(app.stats.total_chars, 3);
+        assert_eq!(app.stats.correct_chars, 2);
+    }
+
+    // -- Remap toggle --
+
+    #[test]
+    fn ctrl_t_toggles_remap() {
+        let mut app = test_app();
+        let initial = app.remap.qwerty_remap;
+        app.handle_key(ctrl_key('t'));
+        assert_ne!(app.remap.qwerty_remap, initial);
+        app.handle_key(ctrl_key('t'));
+        assert_eq!(app.remap.qwerty_remap, initial);
+    }
+
+    // -- next_expected_char --
+
+    #[test]
+    fn next_expected_char_tracks_input() {
+        let mut app = test_app();
+        app.typing.current_word = "hello".into();
+        app.typing.input.clear();
+        assert_eq!(app.next_expected_char(), Some('h'));
+        app.typing.input.push('h');
+        assert_eq!(app.next_expected_char(), Some('e'));
+    }
+
+    #[test]
+    fn next_expected_char_none_at_end() {
+        let mut app = test_app();
+        app.typing.current_word = "hi".into();
+        app.typing.input = "hi".into();
+        assert_eq!(app.next_expected_char(), None);
+    }
+
+    // -- Results --
+
+    #[test]
+    fn results_esc_returns_to_level_select() {
+        let mut app = test_app();
+        app.screen = Screen::Results;
+        app.handle_key(key(KeyCode::Esc));
+        assert!(matches!(app.screen, Screen::LevelSelect));
+    }
+
+    #[test]
+    fn results_enter_restarts_typing() {
+        let mut app = test_app();
+        app.handle_key(key(KeyCode::Enter)); // → level phase
+        app.handle_key(key(KeyCode::Enter)); // → typing (loads words)
+        app.screen = Screen::Results;
+        app.handle_key(key(KeyCode::Enter));
+        assert!(matches!(app.screen, Screen::Typing));
     }
 }

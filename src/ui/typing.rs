@@ -5,9 +5,10 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::Paragraph;
 
 use crate::app::App;
+use crate::config::theme::Theme;
 use crate::ui::keyboard::KeyboardWidget;
 
-pub fn draw(frame: &mut Frame, app: &App) {
+pub fn draw(frame: &mut Frame, app: &App, theme: &Theme) {
     let chunks = Layout::vertical([
         Constraint::Min(0),    // Top spacer
         Constraint::Length(1), // Info bar
@@ -33,7 +34,7 @@ pub fn draw(frame: &mut Frame, app: &App) {
             minutes,
             seconds
         ),
-        Style::default().fg(Color::Indexed(8)),
+        Style::default().fg(theme.secondary()),
     )]))
     .alignment(Alignment::Center);
     frame.render_widget(info_bar, chunks[1]);
@@ -43,9 +44,9 @@ pub fn draw(frame: &mut Frame, app: &App) {
     for (i, expected) in app.typing.current_word.chars().enumerate() {
         let style = if let Some(typed) = app.typing.input.chars().nth(i) {
             if typed == expected {
-                Style::default().fg(Color::Indexed(2))
+                Style::default().fg(theme.correct())
             } else {
-                Style::default().fg(Color::Indexed(1)).bg(Color::Indexed(8))
+                Style::default().fg(theme.incorrect()).bg(theme.secondary())
             }
         } else {
             Style::default().fg(Color::Reset)
@@ -67,20 +68,20 @@ pub fn draw(frame: &mut Frame, app: &App) {
         .join("  ");
     let queue = Paragraph::new(queue_preview)
         .alignment(Alignment::Center)
-        .style(Style::default().fg(Color::Indexed(8)));
+        .style(Style::default().fg(theme.secondary()));
     frame.render_widget(queue, chunks[4]);
 
     // Keyboard
     let active_keys = app.available_keys();
     let highlight = app.next_expected_char();
     let kbd_elapsed = app.start_time.elapsed();
-    let kbd = KeyboardWidget::new(app.layout(), &active_keys, highlight, kbd_elapsed);
+    let kbd = KeyboardWidget::new(app.layout(), &active_keys, highlight, kbd_elapsed, theme);
     frame.render_widget(kbd, centered_rect(chunks[6], 75));
 
     // Help
-    let dim = Style::default().fg(Color::Indexed(8));
+    let dim = Style::default().fg(theme.secondary());
     let remap_span = if app.remap.qwerty_remap {
-        Span::styled("ON", Style::default().fg(Color::Indexed(2)))
+        Span::styled("ON", Style::default().fg(theme.correct()))
     } else {
         Span::styled("OFF", dim)
     };
