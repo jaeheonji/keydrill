@@ -5,8 +5,9 @@ use serde::Deserialize;
 #[serde(default)]
 pub struct Theme {
     pub title: String,
-    pub secondary: String,
     pub selected: String,
+    pub normal: String,
+    pub secondary: String,
     pub highlight: String,
     pub correct: String,
     pub incorrect: String,
@@ -16,30 +17,19 @@ pub struct Theme {
 impl Default for Theme {
     fn default() -> Self {
         Self {
-            correct: "green".into(),
-            incorrect: "red".into(),
-            secondary: "dark_gray".into(),
             title: "blue".into(),
             selected: "blue".into(),
-            highlight: "yellow".into(),
+            normal: "white".into(),
+            secondary: "dark_gray".into(),
+            highlight: "blue".into(),
+            correct: "green".into(),
+            incorrect: "red".into(),
             active_border: "white".into(),
         }
     }
 }
 
 impl Theme {
-    pub fn correct(&self) -> Color {
-        parse_color(&self.correct)
-    }
-
-    pub fn incorrect(&self) -> Color {
-        parse_color(&self.incorrect)
-    }
-
-    pub fn secondary(&self) -> Color {
-        parse_color(&self.secondary)
-    }
-
     pub fn title(&self) -> Color {
         parse_color(&self.title)
     }
@@ -48,8 +38,24 @@ impl Theme {
         parse_color(&self.selected)
     }
 
+    pub fn normal(&self) -> Color {
+        parse_color(&self.normal)
+    }
+
+    pub fn secondary(&self) -> Color {
+        parse_color(&self.secondary)
+    }
+
     pub fn highlight(&self) -> Color {
         parse_color(&self.highlight)
+    }
+
+    pub fn correct(&self) -> Color {
+        parse_color(&self.correct)
+    }
+
+    pub fn incorrect(&self) -> Color {
+        parse_color(&self.incorrect)
     }
 
     pub fn active_border(&self) -> Color {
@@ -150,12 +156,13 @@ mod tests {
     fn default_theme_parses_all_fields() {
         let theme = Theme::default();
         // Ensure all default values produce valid colors (not Reset)
+        assert_ne!(theme.title(), Color::Reset);
+        assert_ne!(theme.selected(), Color::Reset);
+        assert_ne!(theme.normal(), Color::Reset);
+        assert_ne!(theme.secondary(), Color::Reset);
+        assert_ne!(theme.highlight(), Color::Reset);
         assert_ne!(theme.correct(), Color::Reset);
         assert_ne!(theme.incorrect(), Color::Reset);
-        assert_ne!(theme.title(), Color::Reset);
-        assert_ne!(theme.secondary(), Color::Reset);
-        assert_ne!(theme.selected(), Color::Reset);
-        assert_ne!(theme.highlight(), Color::Reset);
         assert_ne!(theme.active_border(), Color::Reset);
     }
 }

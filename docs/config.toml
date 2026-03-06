@@ -6,18 +6,16 @@ qwerty_remap = false
 # Extra layout files or directories to load.
 # Paths can be absolute or relative to the working directory.
 # Directories are scanned for .toml files.
-layouts = [
-    "~/my-layouts/custom.toml",
-    "~/my-layouts/extras/",
-]
+layouts = ["~/my-layouts/custom.toml", "~/my-layouts/extras/"]
 
 [theme]
 # Supports: named colors (red, blue, dark_gray, light_cyan, ...),
 #           256-color index (0-255), hex RGB (#rrggbb)
 title = "blue"
-secondary = "dark_gray"
 selected = "blue"
-highlight = "yellow"
+normal = "white"
+secondary = "dark_gray"
+highlight = "blue"
 correct = "green"
 incorrect = "red"
 active_border = "white"

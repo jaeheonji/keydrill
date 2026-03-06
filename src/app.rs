@@ -72,7 +72,6 @@ pub struct App {
     pub screen: Screen,
     pub layouts: Vec<Layout>,
     pub should_quit: bool,
-    pub start_time: Instant,
     pub select: SelectState,
     pub typing: TypingState,
     pub stats: Stats,
@@ -85,7 +84,6 @@ impl Default for App {
             screen: Screen::default(),
             layouts: Vec::new(),
             should_quit: false,
-            start_time: Instant::now(),
             select: SelectState::default(),
             typing: TypingState::default(),
             stats: Stats::default(),
@@ -111,11 +109,17 @@ impl App {
         &self.layouts[self.select.current_layout_idx]
     }
 
-    pub fn handle_key(&mut self, key: KeyEvent) {
+    pub fn handle_key(&mut self, key: KeyEvent) -> Option<char> {
         match self.screen {
-            Screen::LevelSelect => self.handle_level_select_key(key),
+            Screen::LevelSelect => {
+                self.handle_level_select_key(key);
+                None
+            }
             Screen::Typing => self.handle_typing_key(key),
-            Screen::Results => self.handle_results_key(key),
+            Screen::Results => {
+                self.handle_results_key(key);
+                None
+            }
         }
     }
 
@@ -178,11 +182,11 @@ impl App {
         }
     }
 
-    fn handle_typing_key(&mut self, key: KeyEvent) {
+    fn handle_typing_key(&mut self, key: KeyEvent) -> Option<char> {
         if key.code == KeyCode::Char('t') && key.modifiers.contains(KeyModifiers::CONTROL) {
             tracing::debug!("toggled qwerty remap: {}", !self.remap.qwerty_remap);
             self.remap.qwerty_remap = !self.remap.qwerty_remap;
-            return;
+            return None;
         }
         match key.code {
             KeyCode::Esc => {
@@ -190,6 +194,7 @@ impl App {
                 self.screen = Screen::LevelSelect;
                 self.select.select_screen_entered_at = Instant::now();
                 self.typing.input.clear();
+                None
             }
             KeyCode::Char(c) => {
                 if self.stats.typing_started_at.is_none() {
@@ -212,12 +217,14 @@ impl App {
                     self.score_word();
                     self.advance_word();
                 }
+                Some(c)
             }
             KeyCode::Backspace => {
                 tracing::debug!("backspace");
                 self.typing.input.pop();
+                None
             }
-            _ => {}
+            _ => None,
         }
     }
 
@@ -299,13 +306,14 @@ impl App {
     }
 
     pub fn elapsed_secs(&self) -> f64 {
-        if let Some(secs) = self.stats.elapsed_on_finish {
-            secs
-        } else if let Some(started) = self.stats.typing_started_at {
-            started.elapsed().as_secs_f64()
-        } else {
-            0.0
-        }
+        self.stats
+            .elapsed_on_finish
+            .or_else(|| {
+                self.stats
+                    .typing_started_at
+                    .map(|t| t.elapsed().as_secs_f64())
+            })
+            .unwrap_or(0.0)
     }
 }
 

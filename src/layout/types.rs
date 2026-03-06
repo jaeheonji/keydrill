@@ -28,7 +28,7 @@ pub struct Level {
 }
 
 fn default_word_count() -> usize {
-    50
+    30
 }
 
 fn default_random_words() -> bool {

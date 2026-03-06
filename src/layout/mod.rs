@@ -5,8 +5,7 @@ use std::path::Path;
 
 pub use types::{Layout, Level};
 
-// Used by tests in other modules.
-#[allow(unused_imports)]
+#[cfg(test)]
 pub use builtin::builtin_colemak;
 
 fn load_from_file(path: &Path) -> anyhow::Result<Layout> {
@@ -16,9 +15,8 @@ fn load_from_file(path: &Path) -> anyhow::Result<Layout> {
 }
 
 fn load_from_directory(dir: &Path) -> Vec<Layout> {
-    let entries = match std::fs::read_dir(dir) {
-        Ok(e) => e,
-        Err(_) => return Vec::new(),
+    let Ok(entries) = std::fs::read_dir(dir) else {
+        return Vec::new();
     };
     let mut layouts = Vec::new();
     for entry in entries.flatten() {

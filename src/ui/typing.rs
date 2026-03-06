@@ -63,7 +63,7 @@ pub fn draw(frame: &mut Frame, app: &App, theme: &Theme) {
         .word_queue
         .iter()
         .take(10)
-        .cloned()
+        .map(String::as_str)
         .collect::<Vec<_>>()
         .join("  ");
     let queue = Paragraph::new(queue_preview)
@@ -74,8 +74,7 @@ pub fn draw(frame: &mut Frame, app: &App, theme: &Theme) {
     // Keyboard
     let active_keys = app.available_keys();
     let highlight = app.next_expected_char();
-    let kbd_elapsed = app.start_time.elapsed();
-    let kbd = KeyboardWidget::new(app.layout(), &active_keys, highlight, kbd_elapsed, theme);
+    let kbd = KeyboardWidget::new(app.layout(), &active_keys, highlight, theme);
     frame.render_widget(kbd, centered_rect(chunks[6], 75));
 
     // Help

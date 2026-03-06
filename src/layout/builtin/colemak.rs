@@ -48,7 +48,7 @@ fn colemak_levels() -> Vec<Level> {
             .into_iter()
             .map(String::from)
             .collect(),
-            word_count: 50,
+            word_count: 30,
             random_words: true,
         },
         Level {
@@ -62,7 +62,7 @@ fn colemak_levels() -> Vec<Level> {
             .into_iter()
             .map(String::from)
             .collect(),
-            word_count: 50,
+            word_count: 30,
             random_words: true,
         },
         Level {
@@ -76,7 +76,7 @@ fn colemak_levels() -> Vec<Level> {
             .into_iter()
             .map(String::from)
             .collect(),
-            word_count: 50,
+            word_count: 30,
             random_words: true,
         },
         Level {
@@ -86,13 +86,13 @@ fn colemak_levels() -> Vec<Level> {
                 "want", "water", "wait", "was", "war", "wash", "what", "white", "wide", "wife",
                 "win", "with", "winter", "wish", "wire", "wise", "fit", "first", "find", "fire",
                 "fast", "far", "few", "free", "fresh", "pant", "part", "past", "path", "pin",
-                "pint", "print", "quest", "quiet", "quit", "quite", "gift", "get", "great", "grip",
-                "grit",
+                "pint", "print", "swift", "drift", "swing", "spring", "gift", "get", "great",
+                "grip", "grit",
             ]
             .into_iter()
             .map(String::from)
             .collect(),
-            word_count: 50,
+            word_count: 30,
             random_words: true,
         },
         Level {
@@ -106,7 +106,7 @@ fn colemak_levels() -> Vec<Level> {
             .into_iter()
             .map(String::from)
             .collect(),
-            word_count: 50,
+            word_count: 30,
             random_words: true,
         },
         Level {
@@ -122,7 +122,7 @@ fn colemak_levels() -> Vec<Level> {
             .into_iter()
             .map(String::from)
             .collect(),
-            word_count: 50,
+            word_count: 30,
             random_words: true,
         },
         Level {
@@ -135,7 +135,7 @@ fn colemak_levels() -> Vec<Level> {
             .into_iter()
             .map(String::from)
             .collect(),
-            word_count: 50,
+            word_count: 30,
             random_words: true,
         },
         Level {
@@ -148,7 +148,7 @@ fn colemak_levels() -> Vec<Level> {
             .into_iter()
             .map(String::from)
             .collect(),
-            word_count: 50,
+            word_count: 30,
             random_words: true,
         },
     ]

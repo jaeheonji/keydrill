@@ -127,7 +127,10 @@ fn render_title_animated(buf: &mut Buffer, area: Rect, elapsed_ms: f64, color: C
     }
 }
 
-fn build_layout_items<'a>(app: &App, theme: &Theme) -> (Vec<ListItem<'a>>, &'static str, &'static str) {
+fn build_layout_items<'a>(
+    app: &App,
+    theme: &Theme,
+) -> (Vec<ListItem<'a>>, &'static str, &'static str) {
     let items: Vec<ListItem> = app
         .layouts
         .iter()
@@ -154,7 +157,10 @@ fn build_layout_items<'a>(app: &App, theme: &Theme) -> (Vec<ListItem<'a>>, &'sta
     )
 }
 
-fn build_level_items<'a>(app: &App, theme: &Theme) -> (Vec<ListItem<'a>>, &'static str, &'static str) {
+fn build_level_items<'a>(
+    app: &App,
+    theme: &Theme,
+) -> (Vec<ListItem<'a>>, &'static str, &'static str) {
     let layout = app.layout();
     let items: Vec<ListItem> = layout
         .levels
