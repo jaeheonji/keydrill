@@ -54,7 +54,7 @@ pub fn draw(frame: &mut Frame, app: &App, theme: &Theme) {
     .areas(content_area);
 
     // ASCII art title — direct buffer rendering with animation
-    render_title_animated(frame.buffer_mut(), title_area, elapsed_ms, theme.title());
+    render_title_animated(frame.buffer_mut(), title_area, elapsed_ms, theme.highlight());
 
     // Centered box
     let [box_centered] = Layout::horizontal([Constraint::Length(BOX_WIDTH)])
@@ -64,14 +64,14 @@ pub fn draw(frame: &mut Frame, app: &App, theme: &Theme) {
     let list = List::new(items).block(
         Block::default()
             .borders(Borders::ALL)
-            .title(format!(" {title} ")),
+            .title(format!(" {title} "))
+            .style(Style::default().fg(theme.text())),
     );
     frame.render_widget(list, box_centered);
 
     // Help text
     let help = Paragraph::new(help_text)
-        .alignment(Alignment::Center)
-        .style(Style::default().fg(theme.secondary()));
+        .alignment(Alignment::Center);
     frame.render_widget(help, help_area);
 }
 
@@ -130,7 +130,7 @@ fn render_title_animated(buf: &mut Buffer, area: Rect, elapsed_ms: f64, color: C
 fn build_layout_items<'a>(
     app: &App,
     theme: &Theme,
-) -> (Vec<ListItem<'a>>, &'static str, &'static str) {
+) -> (Vec<ListItem<'a>>, &'static str, Line<'a>) {
     let items: Vec<ListItem> = app
         .layouts
         .iter()
@@ -141,26 +141,35 @@ fn build_layout_items<'a>(
             let content = format!("{prefix}{}", layout.name);
             let style = if selected {
                 Style::default()
-                    .fg(theme.selected())
+                    .fg(theme.highlight())
                     .add_modifier(Modifier::BOLD)
             } else {
-                Style::default().fg(Color::Reset)
+                Style::default().fg(theme.text())
             };
             ListItem::new(Line::from(Span::styled(content, style)))
         })
         .collect();
 
+    let dim = Style::default().fg(theme.secondary());
+    let key = Style::default().fg(theme.primary());
     (
         items,
         "Select Layout",
-        "↑↓ Navigate  Enter/→ Select  Esc Quit",
+        Line::from(vec![
+            Span::styled("↑↓", key),
+            Span::styled(" Navigate  ", dim),
+            Span::styled("Enter/→", key),
+            Span::styled(" Select  ", dim),
+            Span::styled("Esc", key),
+            Span::styled(" Quit", dim),
+        ]),
     )
 }
 
 fn build_level_items<'a>(
     app: &App,
     theme: &Theme,
-) -> (Vec<ListItem<'a>>, &'static str, &'static str) {
+) -> (Vec<ListItem<'a>>, &'static str, Line<'a>) {
     let layout = app.layout();
     let items: Vec<ListItem> = layout
         .levels
@@ -173,19 +182,35 @@ fn build_level_items<'a>(
             let content = format!("{prefix}{}. {} [{keys_str}]", i + 1, level.name);
             let style = if selected {
                 Style::default()
-                    .fg(theme.selected())
+                    .fg(theme.highlight())
                     .add_modifier(Modifier::BOLD)
             } else {
-                Style::default().fg(Color::Reset)
+                Style::default().fg(theme.text())
             };
             ListItem::new(Line::from(Span::styled(content, style)))
         })
         .collect();
 
+    let dim = Style::default().fg(theme.secondary());
+    let key = Style::default().fg(theme.primary());
     let help = if app.layouts.len() > 1 {
-        "↑↓ Navigate  Enter/→ Select  ←/Esc Back"
+        Line::from(vec![
+            Span::styled("↑↓", key),
+            Span::styled(" Navigate  ", dim),
+            Span::styled("Enter/→", key),
+            Span::styled(" Select  ", dim),
+            Span::styled("←/Esc", key),
+            Span::styled(" Back", dim),
+        ])
     } else {
-        "↑↓ Navigate  Enter/→ Select  Esc Quit"
+        Line::from(vec![
+            Span::styled("↑↓", key),
+            Span::styled(" Navigate  ", dim),
+            Span::styled("Enter/→", key),
+            Span::styled(" Select  ", dim),
+            Span::styled("Esc", key),
+            Span::styled(" Quit", dim),
+        ])
     };
 
     (items, "Select Level", help)

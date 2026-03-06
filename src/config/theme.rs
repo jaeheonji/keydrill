@@ -4,42 +4,97 @@ use serde::Deserialize;
 #[derive(Deserialize, Clone)]
 #[serde(default)]
 pub struct Theme {
-    pub title: String,
-    pub selected: String,
-    pub normal: String,
+    pub text: String,
+    pub primary: String,
     pub secondary: String,
     pub highlight: String,
+    pub word: WordTheme,
+    pub keyboard: KeyboardTheme,
+}
+
+#[derive(Deserialize, Clone)]
+#[serde(default)]
+pub struct WordTheme {
+    pub current: String,
     pub correct: String,
     pub incorrect: String,
-    pub active_border: String,
+    pub queue: String,
+}
+
+#[derive(Deserialize, Clone)]
+#[serde(default)]
+pub struct KeyboardTheme {
+    pub next: KeyStyle,
+    pub active: KeyStyle,
+    pub inactive: KeyStyle,
+}
+
+#[derive(Deserialize, Clone)]
+#[serde(default)]
+pub struct KeyStyle {
+    pub text: String,
+    pub border: String,
 }
 
 impl Default for Theme {
     fn default() -> Self {
         Self {
-            title: "blue".into(),
-            selected: "blue".into(),
-            normal: "white".into(),
+            text: "reset".into(),
+            primary: "green".into(),
             secondary: "dark_gray".into(),
             highlight: "blue".into(),
+            word: WordTheme::default(),
+            keyboard: KeyboardTheme::default(),
+        }
+    }
+}
+
+impl Default for WordTheme {
+    fn default() -> Self {
+        Self {
+            current: "reset".into(),
             correct: "green".into(),
             incorrect: "red".into(),
-            active_border: "white".into(),
+            queue: "dark_gray".into(),
+        }
+    }
+}
+
+impl Default for KeyboardTheme {
+    fn default() -> Self {
+        Self {
+            next: KeyStyle {
+                text: "blue".into(),
+                border: "blue".into(),
+            },
+            active: KeyStyle {
+                text: "white".into(),
+                border: "white".into(),
+            },
+            inactive: KeyStyle {
+                text: "dark_gray".into(),
+                border: "dark_gray".into(),
+            },
+        }
+    }
+}
+
+impl Default for KeyStyle {
+    fn default() -> Self {
+        Self {
+            text: "white".into(),
+            border: "white".into(),
         }
     }
 }
 
 impl Theme {
-    pub fn title(&self) -> Color {
-        parse_color(&self.title)
+    pub fn text(&self) -> Color {
+        parse_color(&self.text)
     }
 
-    pub fn selected(&self) -> Color {
-        parse_color(&self.selected)
-    }
-
-    pub fn normal(&self) -> Color {
-        parse_color(&self.normal)
+    pub fn primary(&self) -> Color {
+        parse_color(&self.primary)
     }
 
     pub fn secondary(&self) -> Color {
@@ -48,6 +103,12 @@ impl Theme {
 
     pub fn highlight(&self) -> Color {
         parse_color(&self.highlight)
+    }
+}
+
+impl WordTheme {
+    pub fn current(&self) -> Color {
+        parse_color(&self.current)
     }
 
     pub fn correct(&self) -> Color {
@@ -58,8 +119,18 @@ impl Theme {
         parse_color(&self.incorrect)
     }
 
-    pub fn active_border(&self) -> Color {
-        parse_color(&self.active_border)
+    pub fn queue(&self) -> Color {
+        parse_color(&self.queue)
+    }
+}
+
+impl KeyStyle {
+    pub fn text(&self) -> Color {
+        parse_color(&self.text)
+    }
+
+    pub fn border(&self) -> Color {
+        parse_color(&self.border)
     }
 }
 
@@ -155,14 +226,19 @@ mod tests {
     #[test]
     fn default_theme_parses_all_fields() {
         let theme = Theme::default();
-        // Ensure all default values produce valid colors (not Reset)
-        assert_ne!(theme.title(), Color::Reset);
-        assert_ne!(theme.selected(), Color::Reset);
-        assert_ne!(theme.normal(), Color::Reset);
+        assert_eq!(theme.text(), Color::Reset);
+        assert_ne!(theme.primary(), Color::Reset);
         assert_ne!(theme.secondary(), Color::Reset);
         assert_ne!(theme.highlight(), Color::Reset);
-        assert_ne!(theme.correct(), Color::Reset);
-        assert_ne!(theme.incorrect(), Color::Reset);
-        assert_ne!(theme.active_border(), Color::Reset);
+        assert_ne!(theme.word.correct(), Color::Reset);
+        assert_ne!(theme.word.incorrect(), Color::Reset);
+        assert_eq!(theme.word.current(), Color::Reset);
+        assert_ne!(theme.word.queue(), Color::Reset);
+        assert_ne!(theme.keyboard.next.text(), Color::Reset);
+        assert_ne!(theme.keyboard.next.border(), Color::Reset);
+        assert_ne!(theme.keyboard.active.text(), Color::Reset);
+        assert_ne!(theme.keyboard.active.border(), Color::Reset);
+        assert_ne!(theme.keyboard.inactive.text(), Color::Reset);
+        assert_ne!(theme.keyboard.inactive.border(), Color::Reset);
     }
 }

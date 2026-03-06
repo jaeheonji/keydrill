@@ -1,6 +1,6 @@
 use ratatui::Frame;
 use ratatui::layout::{Alignment, Constraint, Layout};
-use ratatui::style::{Color, Style};
+use ratatui::style::Style;
 use ratatui::text::{Line, Span};
 use ratatui::widgets::Paragraph;
 
@@ -23,7 +23,7 @@ pub fn draw(frame: &mut Frame, app: &App, theme: &Theme) {
     let seconds = (elapsed as u64) % 60;
 
     let dim = Style::default().fg(theme.secondary());
-    let val = Style::default().fg(Color::Reset);
+    let val = Style::default().fg(theme.text());
 
     let chunks = Layout::vertical([
         Constraint::Min(0),    // Top spacer
@@ -67,10 +67,13 @@ pub fn draw(frame: &mut Frame, app: &App, theme: &Theme) {
     .alignment(Alignment::Center);
     frame.render_widget(time_line, chunks[5]);
 
-    let help = Paragraph::new(Line::from(vec![Span::styled(
-        "Enter: Retry  Esc: Back",
-        dim,
-    )]))
+    let key = Style::default().fg(theme.primary());
+    let help = Paragraph::new(Line::from(vec![
+        Span::styled("Enter", key),
+        Span::styled(" Retry  ", dim),
+        Span::styled("Esc", key),
+        Span::styled(" Back", dim),
+    ]))
     .alignment(Alignment::Center);
     frame.render_widget(help, chunks[7]);
 }

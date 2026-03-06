@@ -484,7 +484,8 @@ impl<'a> KeyboardWidget<'a> {
 
 impl Widget for KeyboardWidget<'_> {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        let dim_style = Style::default().fg(self.theme.secondary());
+        let inactive_text = Style::default().fg(self.theme.keyboard.inactive.text());
+        let inactive_border = Style::default().fg(self.theme.keyboard.inactive.border());
 
         for pk in PHYSICAL_KEYS {
             let x = area.x + pk.x;
@@ -511,27 +512,28 @@ impl Widget for KeyboardWidget<'_> {
                     let label = key.normal.encode_utf8(&mut char_buf);
 
                     if is_highlight {
-                        let hl_style = Style::default().fg(self.theme.highlight());
-                        draw_key_box(buf, rect, hl_style);
-                        draw_key_label(buf, rect, label, hl_style);
-                    } else if is_active {
-                        let label_style = Style::default().fg(self.theme.normal());
-                        let border_style = Style::default().fg(self.theme.active_border());
+                        let text_style = Style::default().fg(self.theme.keyboard.next.text());
+                        let border_style = Style::default().fg(self.theme.keyboard.next.border());
                         draw_key_box(buf, rect, border_style);
-                        draw_key_label(buf, rect, label, label_style);
+                        draw_key_label(buf, rect, label, text_style);
+                    } else if is_active {
+                        let text_style = Style::default().fg(self.theme.keyboard.active.text());
+                        let border_style = Style::default().fg(self.theme.keyboard.active.border());
+                        draw_key_box(buf, rect, border_style);
+                        draw_key_label(buf, rect, label, text_style);
                     } else {
-                        draw_key_box(buf, rect, dim_style);
-                        draw_key_label(buf, rect, label, dim_style);
+                        draw_key_box(buf, rect, inactive_border);
+                        draw_key_label(buf, rect, label, inactive_text);
                     }
                 } else {
                     // Physical position exists but no layout key defined
-                    draw_key_box(buf, rect, dim_style);
-                    draw_key_label(buf, rect, "", dim_style);
+                    draw_key_box(buf, rect, inactive_border);
+                    draw_key_label(buf, rect, "", inactive_text);
                 }
             } else {
                 // Modifier/decorative key
-                draw_key_box(buf, rect, dim_style);
-                draw_key_label(buf, rect, pk.label, dim_style);
+                draw_key_box(buf, rect, inactive_border);
+                draw_key_label(buf, rect, pk.label, inactive_text);
             }
         }
     }

@@ -8,14 +8,28 @@ qwerty_remap = false
 # Directories are scanned for .toml files.
 layouts = ["~/my-layouts/custom.toml", "~/my-layouts/extras/"]
 
-[theme]
 # Supports: named colors (red, blue, dark_gray, light_cyan, ...),
 #           256-color index (0-255), hex RGB (#rrggbb)
-title = "blue"
-selected = "blue"
-normal = "white"
-secondary = "dark_gray"
-highlight = "blue"
-correct = "green"
-incorrect = "red"
-active_border = "white"
+[theme]
+text = "reset"              # Default text (level select items, result values)
+primary = "green"           # Key hints in help text, remap ON indicator
+secondary = "dark_gray"     # Help text, labels, dimmed elements
+highlight = "blue"          # Title art, selected items
+
+[theme.word]
+current = "reset"           # Untyped characters in current word
+correct = "green"           # Correctly typed characters
+incorrect = "red"           # Incorrectly typed characters
+queue = "dark_gray"         # Upcoming words preview
+
+[theme.keyboard.next]
+text = "blue"               # Next key to press - label
+border = "blue"             # Next key to press - border
+
+[theme.keyboard.active]
+text = "white"              # Current level keys - label
+border = "white"            # Current level keys - border
+
+[theme.keyboard.inactive]
+text = "dark_gray"          # Other keys - label
+border = "dark_gray"        # Other keys - border

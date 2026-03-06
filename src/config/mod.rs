@@ -86,15 +86,17 @@ mod tests {
         let config: Config = toml::from_str(
             r##"
             [theme]
-            title = "#ff0000"
+            highlight = "#ff0000"
+
+            [theme.word]
             correct = "cyan"
             "##,
         )
         .unwrap();
-        assert_eq!(config.theme.title, "#ff0000");
-        assert_eq!(config.theme.correct, "cyan");
+        assert_eq!(config.theme.highlight, "#ff0000");
+        assert_eq!(config.theme.word.correct, "cyan");
         // Unset fields get defaults
-        assert_eq!(config.theme.incorrect, "red");
+        assert_eq!(config.theme.word.incorrect, "red");
     }
 
     #[test]

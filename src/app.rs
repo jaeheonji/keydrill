@@ -68,6 +68,7 @@ pub struct RemapState {
     pub qwerty_remap_table: HashMap<char, char>,
 }
 
+#[derive(Default)]
 pub struct App {
     pub screen: Screen,
     pub layouts: Vec<Layout>,
@@ -78,19 +79,6 @@ pub struct App {
     pub remap: RemapState,
 }
 
-impl Default for App {
-    fn default() -> Self {
-        Self {
-            screen: Screen::default(),
-            layouts: Vec::new(),
-            should_quit: false,
-            select: SelectState::default(),
-            typing: TypingState::default(),
-            stats: Stats::default(),
-            remap: RemapState::default(),
-        }
-    }
-}
 
 impl App {
     pub fn new(layouts: Vec<Layout>, config: &Config) -> Self {

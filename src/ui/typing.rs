@@ -1,6 +1,6 @@
 use ratatui::Frame;
 use ratatui::layout::{Alignment, Constraint, Layout, Rect};
-use ratatui::style::{Color, Style};
+use ratatui::style::Style;
 use ratatui::text::{Line, Span};
 use ratatui::widgets::Paragraph;
 
@@ -44,12 +44,12 @@ pub fn draw(frame: &mut Frame, app: &App, theme: &Theme) {
     for (i, expected) in app.typing.current_word.chars().enumerate() {
         let style = if let Some(typed) = app.typing.input.chars().nth(i) {
             if typed == expected {
-                Style::default().fg(theme.correct())
+                Style::default().fg(theme.word.correct())
             } else {
-                Style::default().fg(theme.incorrect()).bg(theme.secondary())
+                Style::default().fg(theme.word.incorrect())
             }
         } else {
-            Style::default().fg(Color::Reset)
+            Style::default().fg(theme.word.current())
         };
         spans.push(Span::styled(expected.to_string(), style));
     }
@@ -68,7 +68,7 @@ pub fn draw(frame: &mut Frame, app: &App, theme: &Theme) {
         .join("  ");
     let queue = Paragraph::new(queue_preview)
         .alignment(Alignment::Center)
-        .style(Style::default().fg(theme.secondary()));
+        .style(Style::default().fg(theme.word.queue()));
     frame.render_widget(queue, chunks[4]);
 
     // Keyboard
@@ -79,13 +79,17 @@ pub fn draw(frame: &mut Frame, app: &App, theme: &Theme) {
 
     // Help
     let dim = Style::default().fg(theme.secondary());
+    let key = Style::default().fg(theme.primary());
     let remap_span = if app.remap.qwerty_remap {
-        Span::styled("ON", Style::default().fg(theme.correct()))
+        Span::styled("ON", key)
     } else {
         Span::styled("OFF", dim)
     };
     let help = Paragraph::new(Line::from(vec![
-        Span::styled(" Esc Back | Ctrl+T Remap: ", dim),
+        Span::styled(" Esc", key),
+        Span::styled(" Back | ", dim),
+        Span::styled("Ctrl+T", key),
+        Span::styled(" Remap: ", dim),
         remap_span,
     ]));
     frame.render_widget(help, chunks[8]);
