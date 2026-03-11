@@ -13,8 +13,9 @@ pub fn draw(frame: &mut Frame, app: &App, theme: &Theme) {
         Constraint::Min(0),    // Top spacer
         Constraint::Length(1), // Info bar
         Constraint::Length(1), // Padding
-        Constraint::Length(1), // Current word
         Constraint::Length(1), // Word queue
+        Constraint::Length(1), // Current word
+        Constraint::Length(1), // Input text
         Constraint::Length(1), // Spacer
         Constraint::Length(KeyboardWidget::required_height()),
         Constraint::Min(0),    // Bottom spacer
@@ -55,7 +56,7 @@ pub fn draw(frame: &mut Frame, app: &App, theme: &Theme) {
     }
 
     let word_display = Paragraph::new(Line::from(spans)).alignment(Alignment::Center);
-    frame.render_widget(word_display, chunks[3]);
+    frame.render_widget(word_display, chunks[4]);
 
     // Word queue preview
     let queue_preview: String = app
@@ -69,13 +70,43 @@ pub fn draw(frame: &mut Frame, app: &App, theme: &Theme) {
     let queue = Paragraph::new(queue_preview)
         .alignment(Alignment::Center)
         .style(Style::default().fg(theme.word.queue()));
-    frame.render_widget(queue, chunks[4]);
+    frame.render_widget(queue, chunks[3]);
+
+    // Input text: fixed-width underlined field matching current word length
+    let word_len = app.typing.current_word.len();
+    let mut input_spans = Vec::new();
+    let underline = Style::default()
+        .fg(theme.word.current())
+        .add_modifier(ratatui::style::Modifier::UNDERLINED);
+    for (i, ch) in app.typing.input.chars().enumerate().take(word_len) {
+        let expected = app.typing.current_word.chars().nth(i);
+        let style = if expected == Some(ch) {
+            underline.fg(theme.word.correct())
+        } else {
+            underline.fg(theme.word.incorrect())
+        };
+        input_spans.push(Span::styled(ch.to_string(), style));
+    }
+    // Fill remaining positions with underlined spaces
+    for _ in app.typing.input.len()..word_len {
+        input_spans.push(Span::styled(" ", underline));
+    }
+    // Extra chars beyond word length
+    for ch in app.typing.input.chars().skip(word_len) {
+        input_spans.push(Span::styled(
+            ch.to_string(),
+            underline.fg(theme.word.incorrect()),
+        ));
+    }
+    let input_display =
+        Paragraph::new(Line::from(input_spans)).alignment(Alignment::Center);
+    frame.render_widget(input_display, chunks[5]);
 
     // Keyboard
     let active_keys = app.available_keys();
     let highlight = app.next_expected_char();
     let kbd = KeyboardWidget::new(app.layout(), &active_keys, highlight, theme);
-    frame.render_widget(kbd, centered_rect(chunks[6], 75));
+    frame.render_widget(kbd, centered_rect(chunks[7], 75));
 
     // Help
     let dim = Style::default().fg(theme.secondary());
@@ -92,7 +123,7 @@ pub fn draw(frame: &mut Frame, app: &App, theme: &Theme) {
         Span::styled(" Remap: ", dim),
         remap_span,
     ]));
-    frame.render_widget(help, chunks[8]);
+    frame.render_widget(help, chunks[9]);
 }
 
 fn centered_rect(area: Rect, width: u16) -> Rect {

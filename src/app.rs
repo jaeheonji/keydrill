@@ -184,6 +184,13 @@ impl App {
                 self.typing.input.clear();
                 None
             }
+            KeyCode::Enter => {
+                if !self.typing.input.is_empty() {
+                    self.score_word();
+                    self.advance_word();
+                }
+                None
+            }
             KeyCode::Char(c) => {
                 if self.stats.typing_started_at.is_none() {
                     self.stats.typing_started_at = Some(Instant::now());
@@ -201,10 +208,6 @@ impl App {
                 let correct = expected == Some(c);
                 tracing::debug!(typed = %c, ?expected, correct, word = %self.typing.current_word, "keypress");
                 self.typing.input.push(c);
-                if self.typing.input.len() >= self.typing.current_word.len() {
-                    self.score_word();
-                    self.advance_word();
-                }
                 Some(c)
             }
             KeyCode::Backspace => {
@@ -395,7 +398,7 @@ mod tests {
     }
 
     #[test]
-    fn typing_correct_chars_advances() {
+    fn typing_correct_chars_and_enter_advances() {
         let mut app = test_app();
         app.handle_key(key(KeyCode::Enter));
         app.handle_key(key(KeyCode::Enter));
@@ -405,8 +408,25 @@ mod tests {
         for ch in word.chars() {
             app.handle_key(key(KeyCode::Char(ch)));
         }
+        // Should NOT have advanced yet (no Enter)
+        assert_eq!(app.typing.current_word, word);
+        // Press Enter to submit
+        app.handle_key(key(KeyCode::Enter));
         // Should have advanced to next word or results
         assert_ne!(app.typing.current_word, word);
+    }
+
+    #[test]
+    fn typing_without_enter_does_not_advance() {
+        let mut app = test_app();
+        app.handle_key(key(KeyCode::Enter));
+        app.handle_key(key(KeyCode::Enter));
+
+        let word = app.typing.current_word.clone();
+        for ch in word.chars() {
+            app.handle_key(key(KeyCode::Char(ch)));
+        }
+        assert_eq!(app.typing.current_word, word);
     }
 
     #[test]
