@@ -24,7 +24,6 @@ pub struct WordTheme {
 #[derive(Deserialize, Clone)]
 #[serde(default)]
 pub struct KeyboardTheme {
-    pub next: KeyStyle,
     pub active: KeyStyle,
     pub inactive: KeyStyle,
 }
@@ -63,10 +62,6 @@ impl Default for WordTheme {
 impl Default for KeyboardTheme {
     fn default() -> Self {
         Self {
-            next: KeyStyle {
-                text: "blue".into(),
-                border: "blue".into(),
-            },
             active: KeyStyle {
                 text: "white".into(),
                 border: "white".into(),
@@ -234,8 +229,6 @@ mod tests {
         assert_ne!(theme.word.incorrect(), Color::Reset);
         assert_eq!(theme.word.current(), Color::Reset);
         assert_ne!(theme.word.queue(), Color::Reset);
-        assert_ne!(theme.keyboard.next.text(), Color::Reset);
-        assert_ne!(theme.keyboard.next.border(), Color::Reset);
         assert_ne!(theme.keyboard.active.text(), Color::Reset);
         assert_ne!(theme.keyboard.active.border(), Color::Reset);
         assert_ne!(theme.keyboard.inactive.text(), Color::Reset);

@@ -98,14 +98,12 @@ pub fn draw(frame: &mut Frame, app: &App, theme: &Theme) {
             underline.fg(theme.word.incorrect()),
         ));
     }
-    let input_display =
-        Paragraph::new(Line::from(input_spans)).alignment(Alignment::Center);
+    let input_display = Paragraph::new(Line::from(input_spans)).alignment(Alignment::Center);
     frame.render_widget(input_display, chunks[5]);
 
     // Keyboard
     let active_keys = app.available_keys();
-    let highlight = app.next_expected_char();
-    let kbd = KeyboardWidget::new(app.layout(), &active_keys, highlight, theme);
+    let kbd = KeyboardWidget::new(app.layout(), &active_keys, theme);
     frame.render_widget(kbd, centered_rect(chunks[7], 75));
 
     // Help

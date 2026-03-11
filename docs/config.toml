@@ -22,10 +22,6 @@ correct = "green"           # Correctly typed characters
 incorrect = "red"           # Incorrectly typed characters
 queue = "dark_gray"         # Upcoming words preview
 
-[theme.keyboard.next]
-text = "blue"               # Next key to press - label
-border = "blue"             # Next key to press - border
-
 [theme.keyboard.active]
 text = "white"              # Current level keys - label
 border = "white"            # Current level keys - border

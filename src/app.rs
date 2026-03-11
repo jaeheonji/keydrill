@@ -79,7 +79,6 @@ pub struct App {
     pub remap: RemapState,
 }
 
-
 impl App {
     pub fn new(layouts: Vec<Layout>, config: &Config) -> Self {
         let qwerty_remap_table = layouts[0].build_qwerty_remap();
@@ -289,13 +288,6 @@ impl App {
             .available_keys_for_level(self.select.current_level)
     }
 
-    pub fn next_expected_char(&self) -> Option<char> {
-        self.typing
-            .current_word
-            .chars()
-            .nth(self.typing.input.len())
-    }
-
     pub fn elapsed_secs(&self) -> f64 {
         self.stats
             .elapsed_on_finish
@@ -483,26 +475,6 @@ mod tests {
         assert_ne!(app.remap.qwerty_remap, initial);
         app.handle_key(ctrl_key('t'));
         assert_eq!(app.remap.qwerty_remap, initial);
-    }
-
-    // -- next_expected_char --
-
-    #[test]
-    fn next_expected_char_tracks_input() {
-        let mut app = test_app();
-        app.typing.current_word = "hello".into();
-        app.typing.input.clear();
-        assert_eq!(app.next_expected_char(), Some('h'));
-        app.typing.input.push('h');
-        assert_eq!(app.next_expected_char(), Some('e'));
-    }
-
-    #[test]
-    fn next_expected_char_none_at_end() {
-        let mut app = test_app();
-        app.typing.current_word = "hi".into();
-        app.typing.input = "hi".into();
-        assert_eq!(app.next_expected_char(), None);
     }
 
     // -- Results --

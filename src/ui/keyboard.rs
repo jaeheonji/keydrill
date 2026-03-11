@@ -458,21 +458,14 @@ const PHYSICAL_KEYS: &[PhysicalKey] = &[
 pub struct KeyboardWidget<'a> {
     layout: &'a Layout,
     active_keys: &'a [char],
-    highlight_key: Option<char>,
     theme: &'a Theme,
 }
 
 impl<'a> KeyboardWidget<'a> {
-    pub fn new(
-        layout: &'a Layout,
-        active_keys: &'a [char],
-        highlight_key: Option<char>,
-        theme: &'a Theme,
-    ) -> Self {
+    pub fn new(layout: &'a Layout, active_keys: &'a [char], theme: &'a Theme) -> Self {
         Self {
             layout,
             active_keys,
-            highlight_key,
             theme,
         }
     }
@@ -506,17 +499,11 @@ impl Widget for KeyboardWidget<'_> {
                     .find(|k| k.position.row == row && k.position.col == col);
 
                 if let Some(key) = layout_key {
-                    let is_highlight = self.highlight_key == Some(key.normal);
                     let is_active = self.active_keys.contains(&key.normal);
                     let mut char_buf = [0u8; 4];
                     let label = key.normal.encode_utf8(&mut char_buf);
 
-                    if is_highlight {
-                        let text_style = Style::default().fg(self.theme.keyboard.next.text());
-                        let border_style = Style::default().fg(self.theme.keyboard.next.border());
-                        draw_key_box(buf, rect, border_style);
-                        draw_key_label(buf, rect, label, text_style);
-                    } else if is_active {
+                    if is_active {
                         let text_style = Style::default().fg(self.theme.keyboard.active.text());
                         let border_style = Style::default().fg(self.theme.keyboard.active.border());
                         draw_key_box(buf, rect, border_style);

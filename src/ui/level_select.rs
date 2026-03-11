@@ -54,7 +54,12 @@ pub fn draw(frame: &mut Frame, app: &App, theme: &Theme) {
     .areas(content_area);
 
     // ASCII art title — direct buffer rendering with animation
-    render_title_animated(frame.buffer_mut(), title_area, elapsed_ms, theme.highlight());
+    render_title_animated(
+        frame.buffer_mut(),
+        title_area,
+        elapsed_ms,
+        theme.highlight(),
+    );
 
     // Centered box
     let [box_centered] = Layout::horizontal([Constraint::Length(BOX_WIDTH)])
@@ -70,8 +75,7 @@ pub fn draw(frame: &mut Frame, app: &App, theme: &Theme) {
     frame.render_widget(list, box_centered);
 
     // Help text
-    let help = Paragraph::new(help_text)
-        .alignment(Alignment::Center);
+    let help = Paragraph::new(help_text).alignment(Alignment::Center);
     frame.render_widget(help, help_area);
 }
 
@@ -127,10 +131,7 @@ fn render_title_animated(buf: &mut Buffer, area: Rect, elapsed_ms: f64, color: C
     }
 }
 
-fn build_layout_items<'a>(
-    app: &App,
-    theme: &Theme,
-) -> (Vec<ListItem<'a>>, &'static str, Line<'a>) {
+fn build_layout_items<'a>(app: &App, theme: &Theme) -> (Vec<ListItem<'a>>, &'static str, Line<'a>) {
     let items: Vec<ListItem> = app
         .layouts
         .iter()
@@ -166,10 +167,7 @@ fn build_layout_items<'a>(
     )
 }
 
-fn build_level_items<'a>(
-    app: &App,
-    theme: &Theme,
-) -> (Vec<ListItem<'a>>, &'static str, Line<'a>) {
+fn build_level_items<'a>(app: &App, theme: &Theme) -> (Vec<ListItem<'a>>, &'static str, Line<'a>) {
     let layout = app.layout();
     let items: Vec<ListItem> = layout
         .levels
