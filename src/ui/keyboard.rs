@@ -1,10 +1,14 @@
+use std::time::Duration;
+
 use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
 use ratatui::style::Style;
 use ratatui::widgets::Widget;
 
+use crate::config::EffectConfig;
 use crate::config::theme::Theme;
 use crate::layout::Layout;
+use crate::ui::color_cycle;
 
 const KEY_HEIGHT: u16 = 3;
 
@@ -459,14 +463,26 @@ pub struct KeyboardWidget<'a> {
     layout: &'a Layout,
     active_keys: &'a [char],
     theme: &'a Theme,
+    elapsed: Duration,
+    effect_enabled: bool,
+    palette: Vec<(u8, u8, u8)>,
 }
 
 impl<'a> KeyboardWidget<'a> {
-    pub fn new(layout: &'a Layout, active_keys: &'a [char], theme: &'a Theme) -> Self {
+    pub fn new(
+        layout: &'a Layout,
+        active_keys: &'a [char],
+        theme: &'a Theme,
+        elapsed: Duration,
+        effect: &EffectConfig,
+    ) -> Self {
         Self {
             layout,
             active_keys,
             theme,
+            elapsed,
+            effect_enabled: effect.enabled,
+            palette: effect.resolve_palette(),
         }
     }
 
@@ -477,8 +493,10 @@ impl<'a> KeyboardWidget<'a> {
 
 impl Widget for KeyboardWidget<'_> {
     fn render(self, area: Rect, buf: &mut Buffer) {
+        let inactive_style = Style::default().fg(self.theme.keyboard.inactive.border());
         let inactive_text = Style::default().fg(self.theme.keyboard.inactive.text());
-        let inactive_border = Style::default().fg(self.theme.keyboard.inactive.border());
+        let active_border_style = Style::default().fg(self.theme.keyboard.active.border());
+        let active_text_style = Style::default().fg(self.theme.keyboard.active.text());
 
         for pk in PHYSICAL_KEYS {
             let x = area.x + pk.x;
@@ -491,7 +509,6 @@ impl Widget for KeyboardWidget<'_> {
             let rect = Rect::new(x, y, pk.width, KEY_HEIGHT);
 
             if let Some((row, col)) = pk.grid_pos {
-                // Character key — look up from layout
                 let layout_key = self
                     .layout
                     .keys
@@ -504,22 +521,23 @@ impl Widget for KeyboardWidget<'_> {
                     let label = key.normal.encode_utf8(&mut char_buf);
 
                     if is_active {
-                        let text_style = Style::default().fg(self.theme.keyboard.active.text());
-                        let border_style = Style::default().fg(self.theme.keyboard.active.border());
-                        draw_key_box(buf, rect, border_style);
-                        draw_key_label(buf, rect, label, text_style);
+                        if self.effect_enabled {
+                            draw_key_box_animated(buf, rect, self.elapsed, &self.palette);
+                            let color = color_cycle::cycling_color(self.elapsed, &self.palette);
+                            draw_key_label(buf, rect, label, Style::default().fg(color));
+                        } else {
+                            draw_key_box(buf, rect, active_border_style);
+                            draw_key_label(buf, rect, label, active_text_style);
+                        }
                     } else {
-                        draw_key_box(buf, rect, inactive_border);
+                        draw_key_box(buf, rect, inactive_style);
                         draw_key_label(buf, rect, label, inactive_text);
                     }
                 } else {
-                    // Physical position exists but no layout key defined
-                    draw_key_box(buf, rect, inactive_border);
-                    draw_key_label(buf, rect, "", inactive_text);
+                    draw_key_box(buf, rect, inactive_style);
                 }
             } else {
-                // Modifier/decorative key
-                draw_key_box(buf, rect, inactive_border);
+                draw_key_box(buf, rect, inactive_style);
                 draw_key_label(buf, rect, pk.label, inactive_text);
             }
         }
@@ -546,6 +564,86 @@ fn draw_key_label(buf: &mut Buffer, rect: Rect, label: &str, style: Style) {
         let lx = start_x + i as u16;
         if lx < buf_right && lx < rect.x + rect.width - 1 {
             buf[(lx, label_y)].set_char(ch).set_style(style);
+        }
+    }
+}
+
+fn draw_key_box_animated(buf: &mut Buffer, rect: Rect, elapsed: Duration, palette: &[(u8, u8, u8)]) {
+    let buf_right = buf.area().right();
+    let buf_bottom = buf.area().bottom();
+    let w = rect.width.saturating_sub(1) as f32;
+    let h = rect.height.saturating_sub(1) as f32;
+    let perimeter = 2.0 * (w + h);
+    if perimeter == 0.0 {
+        return;
+    }
+
+    // Helper: compute border color for a cell at (dx, dy) within rect
+    let border_color_at = |dx: u16, dy: u16| -> Style {
+        let pos = if dx == 0 {
+            // Left side (top to bottom)
+            dy as f32
+        } else if dy == rect.height - 1 {
+            // Bottom side (left to right)
+            h + dx as f32
+        } else if dx == rect.width - 1 {
+            // Right side (bottom to top)
+            h + w + (h - dy as f32)
+        } else {
+            // Top side (right to left)
+            2.0 * h + w + (w - dx as f32)
+        };
+        let normalized = pos / perimeter;
+        Style::default().fg(color_cycle::border_color(elapsed, normalized, palette))
+    };
+
+    // Top border
+    if rect.y < buf_bottom {
+        for dx in 1..rect.width.saturating_sub(1) {
+            let x = rect.x + dx;
+            if x < buf_right {
+                buf[(x, rect.y)].set_char('─').set_style(border_color_at(dx, 0));
+            }
+        }
+    }
+
+    // Bottom border
+    let bot = rect.y + rect.height - 1;
+    if bot < buf_bottom {
+        for dx in 1..rect.width.saturating_sub(1) {
+            let x = rect.x + dx;
+            if x < buf_right {
+                buf[(x, bot)].set_char('─').set_style(border_color_at(dx, rect.height - 1));
+            }
+        }
+    }
+
+    // Side borders
+    for dy in 1..rect.height.saturating_sub(1) {
+        let y = rect.y + dy;
+        if y < buf_bottom {
+            if rect.x < buf_right {
+                buf[(rect.x, y)].set_char('│').set_style(border_color_at(0, dy));
+            }
+            let right = rect.x + rect.width - 1;
+            if right < buf_right {
+                buf[(right, y)].set_char('│').set_style(border_color_at(rect.width - 1, dy));
+            }
+        }
+    }
+
+    // Corners
+    let corners = [
+        (0u16, 0u16, '┌'),
+        (rect.width - 1, 0, '┐'),
+        (0, rect.height - 1, '└'),
+        (rect.width - 1, rect.height - 1, '┘'),
+    ];
+    for (dx, dy, c) in corners {
+        let x = rect.x + dx;
+        let y = rect.y + dy;
+        if x < buf_right && y < buf_bottom {
+            buf[(x, y)].set_char(c).set_style(border_color_at(dx, dy));
         }
     }
 }

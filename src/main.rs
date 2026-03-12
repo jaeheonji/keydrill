@@ -85,13 +85,14 @@ fn run(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>, config: &Config) -
     let mut app = App::new(Layout::discover_all(&config.general.layouts), config);
     let mut effects: EffectManager<()> = EffectManager::default();
     let mut last_frame = Instant::now();
+    let app_start = Instant::now();
 
     loop {
         let elapsed = last_frame.elapsed();
         last_frame = Instant::now();
 
         terminal.draw(|frame| {
-            ui::draw(frame, &app, &config.theme);
+            ui::draw(frame, &app, &config.theme, app_start.elapsed(), &config.effect);
             let area = frame.area();
             effects.process_effects(elapsed.into(), frame.buffer_mut(), area);
         })?;

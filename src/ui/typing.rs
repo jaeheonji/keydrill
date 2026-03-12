@@ -5,10 +5,11 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::Paragraph;
 
 use crate::app::App;
+use crate::config::EffectConfig;
 use crate::config::theme::Theme;
 use crate::ui::keyboard::KeyboardWidget;
 
-pub fn draw(frame: &mut Frame, app: &App, theme: &Theme) {
+pub fn draw(frame: &mut Frame, app: &App, theme: &Theme, elapsed: std::time::Duration, effect: &EffectConfig) {
     let chunks = Layout::vertical([
         Constraint::Min(0),    // Top spacer
         Constraint::Length(1), // Info bar
@@ -24,9 +25,9 @@ pub fn draw(frame: &mut Frame, app: &App, theme: &Theme) {
     .split(frame.area());
 
     // Info bar: word count (left) and timer (right)
-    let elapsed = app.elapsed_secs();
-    let minutes = (elapsed as u64) / 60;
-    let seconds = (elapsed as u64) % 60;
+    let elapsed_secs = app.elapsed_secs();
+    let minutes = (elapsed_secs as u64) / 60;
+    let seconds = (elapsed_secs as u64) % 60;
     let info_bar = Paragraph::new(Line::from(vec![Span::styled(
         format!(
             "Word {}/{}  {:02}:{:02}",
@@ -103,7 +104,7 @@ pub fn draw(frame: &mut Frame, app: &App, theme: &Theme) {
 
     // Keyboard
     let active_keys = app.available_keys();
-    let kbd = KeyboardWidget::new(app.layout(), &active_keys, theme);
+    let kbd = KeyboardWidget::new(app.layout(), &active_keys, theme, elapsed, effect);
     frame.render_widget(kbd, centered_rect(chunks[7], 75));
 
     // Help

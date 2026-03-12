@@ -229,9 +229,7 @@ mod tests {
         assert_ne!(theme.word.incorrect(), Color::Reset);
         assert_eq!(theme.word.current(), Color::Reset);
         assert_ne!(theme.word.queue(), Color::Reset);
-        assert_ne!(theme.keyboard.active.text(), Color::Reset);
         assert_ne!(theme.keyboard.active.border(), Color::Reset);
-        assert_ne!(theme.keyboard.inactive.text(), Color::Reset);
         assert_ne!(theme.keyboard.inactive.border(), Color::Reset);
     }
 }

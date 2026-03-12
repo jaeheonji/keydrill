@@ -29,3 +29,10 @@ border = "white"            # Current level keys - border
 [theme.keyboard.inactive]
 text = "dark_gray"          # Other keys - label
 border = "dark_gray"        # Other keys - border
+
+[effect]
+enabled = true              # Enable rainbow cycling animation on active keys
+# Custom colors for the cycling effect (hex RGB only).
+# Expanded to 8 colors via HSL interpolation.
+# Empty = Catppuccin Mocha defaults (Red, Peach, Yellow, Green, Sky, Blue, Mauve)
+cycle_colors = []
