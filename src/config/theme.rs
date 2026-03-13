@@ -1,4 +1,4 @@
-use ratatui::style::Color;
+use ratatui::style::{Color, Style};
 use serde::Deserialize;
 
 #[derive(Deserialize, Clone)]
@@ -99,6 +99,18 @@ impl Theme {
     pub fn highlight(&self) -> Color {
         parse_color(&self.highlight)
     }
+
+    pub fn dim_style(&self) -> Style {
+        Style::default().fg(self.secondary())
+    }
+
+    pub fn key_style(&self) -> Style {
+        Style::default().fg(self.primary())
+    }
+
+    pub fn val_style(&self) -> Style {
+        Style::default().fg(self.text())
+    }
 }
 
 impl WordTheme {
@@ -129,6 +141,17 @@ impl KeyStyle {
     }
 }
 
+pub fn parse_hex_rgb(s: &str) -> Option<(u8, u8, u8)> {
+    let hex = s.strip_prefix('#').unwrap_or(s);
+    if hex.len() != 6 {
+        return None;
+    }
+    let r = u8::from_str_radix(&hex[0..2], 16).ok()?;
+    let g = u8::from_str_radix(&hex[2..4], 16).ok()?;
+    let b = u8::from_str_radix(&hex[4..6], 16).ok()?;
+    Some((r, g, b))
+}
+
 /// Parse a color string into a `ratatui::style::Color`.
 ///
 /// Supported formats:
@@ -138,14 +161,7 @@ impl KeyStyle {
 /// - Hex RGB: `"#rrggbb"`
 fn parse_color(s: &str) -> Color {
     let s = s.trim();
-    if let Some(hex) = s.strip_prefix('#')
-        && hex.len() == 6
-        && let (Ok(r), Ok(g), Ok(b)) = (
-            u8::from_str_radix(&hex[0..2], 16),
-            u8::from_str_radix(&hex[2..4], 16),
-            u8::from_str_radix(&hex[4..6], 16),
-        )
-    {
+    if let Some((r, g, b)) = parse_hex_rgb(s) {
         return Color::Rgb(r, g, b);
     }
     match s.to_lowercase().as_str() {

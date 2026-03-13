@@ -222,11 +222,7 @@ impl App {
         self.screen = Screen::Typing;
         self.typing.input.clear();
         self.typing.word_queue.clear();
-        self.stats.typing_started_at = None;
-        self.stats.total_chars = 0;
-        self.stats.correct_chars = 0;
-        self.stats.completed_words = 0;
-        self.stats.elapsed_on_finish = None;
+        self.stats = Stats::default();
         self.load_words();
         self.typing.word_queue =
             words::shuffled_batch(&self.typing.all_words, self.typing.all_words.len());
@@ -242,7 +238,7 @@ impl App {
     }
 
     fn score_word(&mut self) {
-        let word_len = self.typing.current_word.len();
+        let word_len = self.typing.current_word.chars().count();
         self.stats.total_chars += word_len;
         for (typed, expected) in self
             .typing

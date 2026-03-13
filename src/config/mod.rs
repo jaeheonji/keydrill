@@ -8,6 +8,7 @@ use serde::Deserialize;
 pub use theme::Theme;
 
 use crate::ui::color_cycle;
+use theme::parse_hex_rgb;
 
 #[derive(Deserialize, Default)]
 #[serde(default)]
@@ -41,21 +42,9 @@ impl EffectConfig {
 
         let mut parsed = Vec::new();
         for entry in &self.cycle_colors {
-            let Some(hex) = entry.strip_prefix('#') else {
-                tracing::warn!("invalid cycle_colors entry '{}', falling back to default", entry);
-                return color_cycle::expand_palette(&Self::mocha_defaults());
-            };
-            if hex.len() != 6 {
-                tracing::warn!("invalid cycle_colors entry '{}', falling back to default", entry);
-                return color_cycle::expand_palette(&Self::mocha_defaults());
-            }
-            match (
-                u8::from_str_radix(&hex[0..2], 16),
-                u8::from_str_radix(&hex[2..4], 16),
-                u8::from_str_radix(&hex[4..6], 16),
-            ) {
-                (Ok(r), Ok(g), Ok(b)) => parsed.push((r, g, b)),
-                _ => {
+            match parse_hex_rgb(entry) {
+                Some(rgb) => parsed.push(rgb),
+                None => {
                     tracing::warn!("invalid cycle_colors entry '{}', falling back to default", entry);
                     return color_cycle::expand_palette(&Self::mocha_defaults());
                 }

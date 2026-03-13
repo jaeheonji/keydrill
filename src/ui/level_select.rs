@@ -131,6 +131,18 @@ fn render_title_animated(buf: &mut Buffer, area: Rect, elapsed_ms: f64, color: C
     }
 }
 
+fn styled_list_item<'a>(content: String, selected: bool, theme: &Theme) -> ListItem<'a> {
+    let style = if selected {
+        Style::default()
+            .fg(theme.highlight())
+            .add_modifier(Modifier::BOLD)
+    } else {
+        Style::default().fg(theme.text())
+    };
+    let prefix = if selected { "▸ " } else { "  " };
+    ListItem::new(Line::from(Span::styled(format!("{prefix}{content}"), style)))
+}
+
 fn build_layout_items<'a>(app: &App, theme: &Theme) -> (Vec<ListItem<'a>>, &'static str, Line<'a>) {
     let items: Vec<ListItem> = app
         .layouts
@@ -138,21 +150,12 @@ fn build_layout_items<'a>(app: &App, theme: &Theme) -> (Vec<ListItem<'a>>, &'sta
         .enumerate()
         .map(|(i, layout)| {
             let selected = i == app.select.current_layout_idx;
-            let prefix = if selected { "▸ " } else { "  " };
-            let content = format!("{prefix}{}", layout.name);
-            let style = if selected {
-                Style::default()
-                    .fg(theme.highlight())
-                    .add_modifier(Modifier::BOLD)
-            } else {
-                Style::default().fg(theme.text())
-            };
-            ListItem::new(Line::from(Span::styled(content, style)))
+            styled_list_item(layout.name.clone(), selected, theme)
         })
         .collect();
 
-    let dim = Style::default().fg(theme.secondary());
-    let key = Style::default().fg(theme.primary());
+    let dim = theme.dim_style();
+    let key = theme.key_style();
     (
         items,
         "Select Layout",
@@ -176,40 +179,25 @@ fn build_level_items<'a>(app: &App, theme: &Theme) -> (Vec<ListItem<'a>>, &'stat
         .map(|(i, level)| {
             let keys_str: String = level.new_keys.iter().collect();
             let selected = i == app.select.current_level;
-            let prefix = if selected { "▸ " } else { "  " };
-            let content = format!("{prefix}{}. {} [{keys_str}]", i + 1, level.name);
-            let style = if selected {
-                Style::default()
-                    .fg(theme.highlight())
-                    .add_modifier(Modifier::BOLD)
-            } else {
-                Style::default().fg(theme.text())
-            };
-            ListItem::new(Line::from(Span::styled(content, style)))
+            styled_list_item(format!("{}. {} [{keys_str}]", i + 1, level.name), selected, theme)
         })
         .collect();
 
-    let dim = Style::default().fg(theme.secondary());
-    let key = Style::default().fg(theme.primary());
-    let help = if app.layouts.len() > 1 {
-        Line::from(vec![
-            Span::styled("↑↓", key),
-            Span::styled(" Navigate  ", dim),
-            Span::styled("Enter/→", key),
-            Span::styled(" Select  ", dim),
-            Span::styled("←/Esc", key),
-            Span::styled(" Back", dim),
-        ])
+    let dim = theme.dim_style();
+    let key = theme.key_style();
+    let (back_key, back_label) = if app.layouts.len() > 1 {
+        ("←/Esc", " Back")
     } else {
-        Line::from(vec![
-            Span::styled("↑↓", key),
-            Span::styled(" Navigate  ", dim),
-            Span::styled("Enter/→", key),
-            Span::styled(" Select  ", dim),
-            Span::styled("Esc", key),
-            Span::styled(" Quit", dim),
-        ])
+        ("Esc", " Quit")
     };
+    let help = Line::from(vec![
+        Span::styled("↑↓", key),
+        Span::styled(" Navigate  ", dim),
+        Span::styled("Enter/→", key),
+        Span::styled(" Select  ", dim),
+        Span::styled(back_key, key),
+        Span::styled(back_label, dim),
+    ]);
 
     (items, "Select Level", help)
 }

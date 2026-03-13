@@ -5,11 +5,10 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::Paragraph;
 
 use crate::app::App;
-use crate::config::EffectConfig;
 use crate::config::theme::Theme;
 use crate::ui::keyboard::KeyboardWidget;
 
-pub fn draw(frame: &mut Frame, app: &App, theme: &Theme, elapsed: std::time::Duration, effect: &EffectConfig) {
+pub fn draw(frame: &mut Frame, app: &App, theme: &Theme, elapsed: std::time::Duration, effect_enabled: bool, palette: &[(u8, u8, u8)]) {
     let chunks = Layout::vertical([
         Constraint::Min(0),    // Top spacer
         Constraint::Length(1), // Info bar
@@ -43,8 +42,9 @@ pub fn draw(frame: &mut Frame, app: &App, theme: &Theme, elapsed: std::time::Dur
 
     // Current word with per-character coloring
     let mut spans = Vec::new();
-    for (i, expected) in app.typing.current_word.chars().enumerate() {
-        let style = if let Some(typed) = app.typing.input.chars().nth(i) {
+    let mut input_chars = app.typing.input.chars();
+    for expected in app.typing.current_word.chars() {
+        let style = if let Some(typed) = input_chars.next() {
             if typed == expected {
                 Style::default().fg(theme.word.correct())
             } else {
@@ -74,42 +74,45 @@ pub fn draw(frame: &mut Frame, app: &App, theme: &Theme, elapsed: std::time::Dur
     frame.render_widget(queue, chunks[3]);
 
     // Input text: fixed-width underlined field matching current word length
-    let word_len = app.typing.current_word.len();
+    let word_char_count = app.typing.current_word.chars().count();
     let mut input_spans = Vec::new();
     let underline = Style::default()
         .fg(theme.word.current())
         .add_modifier(ratatui::style::Modifier::UNDERLINED);
-    for (i, ch) in app.typing.input.chars().enumerate().take(word_len) {
-        let expected = app.typing.current_word.chars().nth(i);
-        let style = if expected == Some(ch) {
-            underline.fg(theme.word.correct())
+    let mut word_chars = app.typing.current_word.chars();
+    let mut typed_count = 0;
+    for ch in app.typing.input.chars() {
+        if typed_count < word_char_count {
+            let expected = word_chars.next();
+            let style = if expected == Some(ch) {
+                underline.fg(theme.word.correct())
+            } else {
+                underline.fg(theme.word.incorrect())
+            };
+            input_spans.push(Span::styled(ch.to_string(), style));
         } else {
-            underline.fg(theme.word.incorrect())
-        };
-        input_spans.push(Span::styled(ch.to_string(), style));
+            input_spans.push(Span::styled(
+                ch.to_string(),
+                underline.fg(theme.word.incorrect()),
+            ));
+        }
+        typed_count += 1;
     }
     // Fill remaining positions with underlined spaces
-    for _ in app.typing.input.len()..word_len {
+    for _ in typed_count..word_char_count {
         input_spans.push(Span::styled(" ", underline));
-    }
-    // Extra chars beyond word length
-    for ch in app.typing.input.chars().skip(word_len) {
-        input_spans.push(Span::styled(
-            ch.to_string(),
-            underline.fg(theme.word.incorrect()),
-        ));
     }
     let input_display = Paragraph::new(Line::from(input_spans)).alignment(Alignment::Center);
     frame.render_widget(input_display, chunks[5]);
 
     // Keyboard
     let active_keys = app.available_keys();
-    let kbd = KeyboardWidget::new(app.layout(), &active_keys, theme, elapsed, effect);
+    let kbd = KeyboardWidget::new(app.layout(), &active_keys, theme, elapsed, effect_enabled, palette);
     frame.render_widget(kbd, centered_rect(chunks[7], 75));
 
     // Help
-    let dim = Style::default().fg(theme.secondary());
-    let key = Style::default().fg(theme.primary());
+    let dim = theme.dim_style();
+    let key = theme.key_style();
     let remap_span = if app.remap.qwerty_remap {
         Span::styled("ON", key)
     } else {

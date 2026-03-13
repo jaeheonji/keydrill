@@ -88,7 +88,7 @@ pub fn expand_palette(input: &[(u8, u8, u8)]) -> Vec<(u8, u8, u8)> {
     // Positions of input colors in the 8-slot ring
     let positions: Vec<f64> = (0..n).map(|i| 8.0 * i as f64 / n as f64).collect();
 
-    for slot in 0..8 {
+    for (slot, result_slot) in result.iter_mut().enumerate() {
         let slot_f = slot as f64;
         // Find which two input colors this slot falls between
         let mut before_idx = 0;
@@ -108,7 +108,7 @@ pub fn expand_palette(input: &[(u8, u8, u8)]) -> Vec<(u8, u8, u8)> {
 
         let span = after_pos - before_pos;
         if span < 1e-6 {
-            result[slot] = input[before_idx];
+            *result_slot = input[before_idx];
             continue;
         }
 
@@ -129,7 +129,7 @@ pub fn expand_palette(input: &[(u8, u8, u8)]) -> Vec<(u8, u8, u8)> {
         let s = s1 + (s2 - s1) * t;
         let l = l1 + (l2 - l1) * t;
 
-        result[slot] = hsl_to_rgb(h, s, l);
+        *result_slot = hsl_to_rgb(h, s, l);
     }
 
     result.to_vec()
