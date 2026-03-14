@@ -15,23 +15,28 @@ jobs:
             runner: ubuntu-latest
             asset: keydrill-x86_64-linux
           - target: x86_64-apple-darwin
-            runner: macos-13
+            runner: macos-latest
             asset: keydrill-x86_64-macos
+            cross: true
           - target: aarch64-apple-darwin
-            runner: macos-14
+            runner: macos-latest
             asset: keydrill-aarch64-macos
     steps:
       - uses: actions/checkout@v4
 
       - uses: dtolnay/rust-toolchain@stable
 
+      - name: Add cross-compilation target
+        if: matrix.cross
+        run: rustup target add ${{ matrix.target }}
+
       - uses: Swatinem/rust-cache@v2
 
       - name: Build
-        run: cargo build --release
+        run: cargo build --release --target ${{ matrix.target }}
 
       - name: Rename binary
-        run: mv target/release/keydrill ${{ matrix.asset }}
+        run: mv target/${{ matrix.target }}/release/keydrill ${{ matrix.asset }}
 
       - uses: actions/upload-artifact@v4
         with:
