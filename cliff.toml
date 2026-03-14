@@ -31,6 +31,7 @@ filter_unconventional = true
 split_commits = false
 commit_parsers = [
     { message = "^chore\\(release\\)", skip = true },
+    { message = "^docs: update CHANGELOG", skip = true },
     { message = "^feat", group = "<!-- 0 -->Features" },
     { message = "^fix", group = "<!-- 1 -->Bug Fixes" },
     { message = "^refactor", group = "<!-- 2 -->Refactor" },
