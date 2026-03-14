@@ -1,0 +1,13 @@
+name = "Colemak (Custom Levels)"
+
+builtin = "Colemak"
+
+# No keys section needed — keys are inherited from the builtin Colemak layout.
+
+[[levels]]
+name = "Home Row Basics"
+new_keys = ["a", "r", "s", "t"]
+
+[[levels]]
+name = "Home Row Extended"
+new_keys = ["n", "e", "i", "o"]
