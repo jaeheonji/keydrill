@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 
 ### Documentation
 
+- Update CHANGELOG.md [skip ci] ([648a706](https://github.com/jaeheonji/keydrill/commit/648a706f71c6b162b28a398e68122fae12deaba9))
 - Update CHANGELOG.md [skip ci] ([658f919](https://github.com/jaeheonji/keydrill/commit/658f91931aa653e1c18351084c18465ba7a26cf2))
 - Add README, configuration guide, and custom layouts guide ([3b376cb](https://github.com/jaeheonji/keydrill/commit/3b376cb78ea6a0f8dea8b1402c1f71a44615572f))
 - Add example custom Colemak layout file ([30723b1](https://github.com/jaeheonji/keydrill/commit/30723b17e19916eb49a75c07c6c929182c852259))
