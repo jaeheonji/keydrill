@@ -60,18 +60,6 @@ jobs:
         with:
           files: artifacts/*
 
-  publish-crates:
-    name: Publish to crates.io
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: dtolnay/rust-toolchain@stable
-
-      - name: Publish
-        run: cargo publish --token ${{ secrets.CRATES_TOKEN }}
-
   changelog:
     name: Update Release Notes
     runs-on: ubuntu-latest

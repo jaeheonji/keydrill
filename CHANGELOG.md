@@ -4,10 +4,6 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-### Bug Fixes
-
-- *(ci)* Use macos-latest with cross-compilation for x86_64 target ([53b296c](https://github.com/jaeheonji/keydrill/commit/53b296cbb90119374e838a78ac32d313ece3c163))
-
 ## [1.0.0] - 2026-03-14
 
 ### Features
@@ -21,6 +17,10 @@ All notable changes to this project will be documented in this file.
 - Rework word pool, theme, and remove keyboard effects from UI ([a87b284](https://github.com/jaeheonji/keydrill/commit/a87b2847f9a361020bb6ad052d5bf770a363aa5b))
 - Add config system with customizable theme and external layout loading ([65ece5c](https://github.com/jaeheonji/keydrill/commit/65ece5ccfd11ef9ba9bd809d4fdea37d7dbb6888))
 - Add debug logging with --debug CLI flag ([9608c1d](https://github.com/jaeheonji/keydrill/commit/9608c1d9a4ae94db86ea7f74a0c961cb74ec3ea5))
+
+### Bug Fixes
+
+- *(ci)* Use macos-latest with cross-compilation for x86_64 target ([53b296c](https://github.com/jaeheonji/keydrill/commit/53b296cbb90119374e838a78ac32d313ece3c163))
 
 ### Refactor
 
