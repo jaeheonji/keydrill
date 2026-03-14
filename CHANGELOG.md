@@ -8,6 +8,11 @@ All notable changes to this project will be documented in this file.
 
 - Update README installation section with actual install methods ([9c4404f](https://github.com/jaeheonji/keydrill/commit/9c4404fe97ad06469f38513a9f801006db83baf4))
 
+### Miscellaneous
+
+- Add keydrill logo image ([a56dc42](https://github.com/jaeheonji/keydrill/commit/a56dc42464d7a4e5a40c66cdb1a0e099c47cc791))
+- Sync Cargo.lock version to 1.0.0 [skip ci] ([6b85fa7](https://github.com/jaeheonji/keydrill/commit/6b85fa75881be2a10d7b10c274a00f4cb6332aa5))
+
 ## [1.0.0] - 2026-03-14
 
 ### Features
