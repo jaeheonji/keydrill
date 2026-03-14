@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Documentation
+
+- Update README installation section with actual install methods ([9c4404f](https://github.com/jaeheonji/keydrill/commit/9c4404fe97ad06469f38513a9f801006db83baf4))
+
 ## [1.0.0] - 2026-03-14
 
 ### Features
