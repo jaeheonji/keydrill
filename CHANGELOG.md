@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Bug Fixes
+
+- *(ci)* Use macos-latest with cross-compilation for x86_64 target ([53b296c](https://github.com/jaeheonji/keydrill/commit/53b296cbb90119374e838a78ac32d313ece3c163))
+
+## [1.0.0] - 2026-03-14
+
 ### Features
 
 - Validate external layout files, error on missing keys or unknown builtin ([03fd9e7](https://github.com/jaeheonji/keydrill/commit/03fd9e7e353707f8f07b61040b23689a9f3df3e2))
@@ -32,6 +38,7 @@ All notable changes to this project will be documented in this file.
 
 ### Miscellaneous
 
+- Exclude changelog update commits from changelog [skip ci] ([2ce203a](https://github.com/jaeheonji/keydrill/commit/2ce203abc86faca4b3a614433e1a41a7ac38a0b2))
 - Skip release bump commits from changelog ([73b3464](https://github.com/jaeheonji/keydrill/commit/73b3464ca47b7bcee3dc87999f1f5b020b3390ca))
 - Add package authors and description ([b5f89cd](https://github.com/jaeheonji/keydrill/commit/b5f89cd05ec9c1c6f9f5caac9bf892338a81ada5))
 
