@@ -302,7 +302,7 @@ mod tests {
     use crossterm::event::KeyEventKind;
 
     fn test_app() -> App {
-        let layouts = crate::layout::Layout::discover_all(&[]);
+        let layouts = crate::layout::Layout::discover_all(&[]).unwrap();
         let config = Config::default();
         App::new(layouts, &config)
     }

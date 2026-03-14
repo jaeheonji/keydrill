@@ -38,6 +38,9 @@ fn default_random_words() -> bool {
 #[derive(Debug, Clone, Deserialize)]
 pub struct Layout {
     pub name: String,
+    #[serde(default)]
+    pub builtin: Option<String>,
+    #[serde(default)]
     pub keys: Vec<KeyMapping>,
     pub levels: Vec<Level>,
 }

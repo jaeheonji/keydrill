@@ -82,7 +82,7 @@ fn main() -> Result<()> {
 }
 
 fn run(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>, config: &Config) -> Result<()> {
-    let mut app = App::new(Layout::discover_all(&config.general.layouts), config);
+    let mut app = App::new(Layout::discover_all(&config.general.layouts)?, config);
     let mut effects: EffectManager<()> = EffectManager::default();
     let mut last_frame = Instant::now();
     let app_start = Instant::now();

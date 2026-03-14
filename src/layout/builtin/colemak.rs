@@ -3,6 +3,7 @@ use crate::layout::types::{KeyMapping, KeyPosition, Layout, Level};
 pub fn builtin_colemak() -> Layout {
     Layout {
         name: "Colemak".into(),
+        builtin: None,
         keys: colemak_keys(),
         levels: colemak_levels(),
     }
