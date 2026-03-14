@@ -1,6 +1,6 @@
 [package]
 name = "keydrill"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2024"
 authors = ["Jaeheon Ji <atx6419@gmail.com>"]
 description = "Keydrill — A terminal-based keyboard layout learning tool."
