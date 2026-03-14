@@ -8,7 +8,14 @@ use crate::app::App;
 use crate::config::theme::Theme;
 use crate::ui::keyboard::KeyboardWidget;
 
-pub fn draw(frame: &mut Frame, app: &App, theme: &Theme, elapsed: std::time::Duration, effect_enabled: bool, palette: &[(u8, u8, u8)]) {
+pub fn draw(
+    frame: &mut Frame,
+    app: &App,
+    theme: &Theme,
+    elapsed: std::time::Duration,
+    effect_enabled: bool,
+    palette: &[(u8, u8, u8)],
+) {
     let chunks = Layout::vertical([
         Constraint::Min(0),    // Top spacer
         Constraint::Length(1), // Info bar
@@ -107,7 +114,14 @@ pub fn draw(frame: &mut Frame, app: &App, theme: &Theme, elapsed: std::time::Dur
 
     // Keyboard
     let active_keys = app.available_keys();
-    let kbd = KeyboardWidget::new(app.layout(), &active_keys, theme, elapsed, effect_enabled, palette);
+    let kbd = KeyboardWidget::new(
+        app.layout(),
+        &active_keys,
+        theme,
+        elapsed,
+        effect_enabled,
+        palette,
+    );
     frame.render_widget(kbd, centered_rect(chunks[7], 75));
 
     // Help

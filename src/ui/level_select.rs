@@ -140,7 +140,10 @@ fn styled_list_item<'a>(content: String, selected: bool, theme: &Theme) -> ListI
         Style::default().fg(theme.text())
     };
     let prefix = if selected { "▸ " } else { "  " };
-    ListItem::new(Line::from(Span::styled(format!("{prefix}{content}"), style)))
+    ListItem::new(Line::from(Span::styled(
+        format!("{prefix}{content}"),
+        style,
+    )))
 }
 
 fn build_layout_items<'a>(app: &App, theme: &Theme) -> (Vec<ListItem<'a>>, &'static str, Line<'a>) {
@@ -179,7 +182,11 @@ fn build_level_items<'a>(app: &App, theme: &Theme) -> (Vec<ListItem<'a>>, &'stat
         .map(|(i, level)| {
             let keys_str: String = level.new_keys.iter().collect();
             let selected = i == app.select.current_level;
-            styled_list_item(format!("{}. {} [{keys_str}]", i + 1, level.name), selected, theme)
+            styled_list_item(
+                format!("{}. {} [{keys_str}]", i + 1, level.name),
+                selected,
+                theme,
+            )
         })
         .collect();
 

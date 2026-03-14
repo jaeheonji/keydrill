@@ -115,7 +115,11 @@ pub fn expand_palette(input: &[(u8, u8, u8)]) -> Vec<(u8, u8, u8)> {
         let t = ((slot_f - before_pos).rem_euclid(8.0)) / span;
         let t = t.clamp(0.0, 1.0);
 
-        let (h1, s1, l1) = rgb_to_hsl(input[before_idx].0, input[before_idx].1, input[before_idx].2);
+        let (h1, s1, l1) = rgb_to_hsl(
+            input[before_idx].0,
+            input[before_idx].1,
+            input[before_idx].2,
+        );
         let (h2, s2, l2) = rgb_to_hsl(input[after_idx].0, input[after_idx].1, input[after_idx].2);
 
         // Shortest-path hue interpolation

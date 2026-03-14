@@ -24,11 +24,23 @@ struct PhysicalKey {
 macro_rules! key {
     // Typeable key: grid_pos = Some((r, c)), label = ""
     ($row:expr, $x:expr, $w:expr, ($r:expr, $c:expr)) => {
-        PhysicalKey { row: $row, x: $x, width: $w, label: "", grid_pos: Some(($r, $c)) }
+        PhysicalKey {
+            row: $row,
+            x: $x,
+            width: $w,
+            label: "",
+            grid_pos: Some(($r, $c)),
+        }
     };
     // Modifier/decorator key: grid_pos = None, label = $lbl
     ($row:expr, $x:expr, $w:expr, $lbl:expr) => {
-        PhysicalKey { row: $row, x: $x, width: $w, label: $lbl, grid_pos: None }
+        PhysicalKey {
+            row: $row,
+            x: $x,
+            width: $w,
+            label: $lbl,
+            grid_pos: None,
+        }
     };
 }
 
@@ -36,8 +48,8 @@ macro_rules! key {
 // 1u = 5 chars, total width per row = 75 chars
 const PHYSICAL_KEYS: &[PhysicalKey] = &[
     // Row 0: 13×1u + Backspace(2u=10) = 75
-    key!(0,  0, 5, (0, 0)),
-    key!(0,  5, 5, (0, 1)),
+    key!(0, 0, 5, (0, 0)),
+    key!(0, 5, 5, (0, 1)),
     key!(0, 10, 5, (0, 2)),
     key!(0, 15, 5, (0, 3)),
     key!(0, 20, 5, (0, 4)),
@@ -51,8 +63,8 @@ const PHYSICAL_KEYS: &[PhysicalKey] = &[
     key!(0, 60, 5, (0, 12)),
     key!(0, 65, 10, "Bksp"),
     // Row 1: Tab(8) + 12×1u + \(7) = 75
-    key!(1,  0, 8, "Tab"),
-    key!(1,  8, 5, (1, 0)),
+    key!(1, 0, 8, "Tab"),
+    key!(1, 8, 5, (1, 0)),
     key!(1, 13, 5, (1, 1)),
     key!(1, 18, 5, (1, 2)),
     key!(1, 23, 5, (1, 3)),
@@ -66,8 +78,8 @@ const PHYSICAL_KEYS: &[PhysicalKey] = &[
     key!(1, 63, 5, (1, 11)),
     key!(1, 68, 7, "\\"),
     // Row 2: Caps(9) + 11×1u + Enter(11) = 75
-    key!(2,  0, 9, "Caps"),
-    key!(2,  9, 5, (2, 0)),
+    key!(2, 0, 9, "Caps"),
+    key!(2, 9, 5, (2, 0)),
     key!(2, 14, 5, (2, 1)),
     key!(2, 19, 5, (2, 2)),
     key!(2, 24, 5, (2, 3)),
@@ -80,7 +92,7 @@ const PHYSICAL_KEYS: &[PhysicalKey] = &[
     key!(2, 59, 5, (2, 10)),
     key!(2, 64, 11, "Enter"),
     // Row 3: LShift(11) + 10×1u + RShift(14) = 75
-    key!(3,  0, 11, "Shift"),
+    key!(3, 0, 11, "Shift"),
     key!(3, 11, 5, (3, 0)),
     key!(3, 16, 5, (3, 1)),
     key!(3, 21, 5, (3, 2)),
@@ -93,14 +105,14 @@ const PHYSICAL_KEYS: &[PhysicalKey] = &[
     key!(3, 56, 5, (3, 9)),
     key!(3, 61, 14, "Shift"),
     // Row 4: Ctrl(8)+Sup(7)+Alt(7)+Space(25)+Alt(7)+Sup(7)+Fn(6)+Ctrl(8) = 75
-    key!(4,  0,  8, "Ctrl"),
-    key!(4,  8,  7, "Sup"),
-    key!(4, 15,  7, "Alt"),
+    key!(4, 0, 8, "Ctrl"),
+    key!(4, 8, 7, "Sup"),
+    key!(4, 15, 7, "Alt"),
     key!(4, 22, 25, ""),
-    key!(4, 47,  7, "Alt"),
-    key!(4, 54,  7, "Sup"),
-    key!(4, 61,  6, "Fn"),
-    key!(4, 67,  8, "Ctrl"),
+    key!(4, 47, 7, "Alt"),
+    key!(4, 54, 7, "Sup"),
+    key!(4, 61, 6, "Fn"),
+    key!(4, 67, 8, "Ctrl"),
 ];
 
 pub struct KeyboardWidget<'a> {
@@ -213,7 +225,12 @@ fn draw_key_label(buf: &mut Buffer, rect: Rect, label: &str, style: Style) {
     }
 }
 
-fn draw_key_box_animated(buf: &mut Buffer, rect: Rect, elapsed: Duration, palette: &[(u8, u8, u8)]) {
+fn draw_key_box_animated(
+    buf: &mut Buffer,
+    rect: Rect,
+    elapsed: Duration,
+    palette: &[(u8, u8, u8)],
+) {
     let w = rect.width.saturating_sub(1) as f32;
     let h = rect.height.saturating_sub(1) as f32;
     let perimeter = 2.0 * (w + h);
@@ -256,7 +273,9 @@ fn draw_key_border(buf: &mut Buffer, rect: Rect, style_at: impl Fn(u16, u16) -> 
         for dx in 1..rect.width.saturating_sub(1) {
             let x = rect.x + dx;
             if x < buf_right {
-                buf[(x, bot)].set_char('─').set_style(style_at(dx, rect.height - 1));
+                buf[(x, bot)]
+                    .set_char('─')
+                    .set_style(style_at(dx, rect.height - 1));
             }
         }
     }
@@ -270,7 +289,9 @@ fn draw_key_border(buf: &mut Buffer, rect: Rect, style_at: impl Fn(u16, u16) -> 
             }
             let right = rect.x + rect.width - 1;
             if right < buf_right {
-                buf[(right, y)].set_char('│').set_style(style_at(rect.width - 1, dy));
+                buf[(right, y)]
+                    .set_char('│')
+                    .set_style(style_at(rect.width - 1, dy));
             }
         }
     }

@@ -54,10 +54,7 @@ fn resolve_external_layouts(
                     );
                 }
             } else {
-                bail!(
-                    "Layout '{}': no keys and no builtin reference",
-                    layout.name
-                );
+                bail!("Layout '{}': no keys and no builtin reference", layout.name);
             }
         } else if layout.builtin.is_some() {
             tracing::warn!(

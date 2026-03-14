@@ -45,7 +45,10 @@ impl EffectConfig {
             match parse_hex_rgb(entry) {
                 Some(rgb) => parsed.push(rgb),
                 None => {
-                    tracing::warn!("invalid cycle_colors entry '{}', falling back to default", entry);
+                    tracing::warn!(
+                        "invalid cycle_colors entry '{}', falling back to default",
+                        entry
+                    );
                     return color_cycle::expand_palette(&Self::mocha_defaults());
                 }
             }
