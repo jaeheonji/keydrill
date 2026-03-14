@@ -17,13 +17,17 @@ A terminal-based keyboard layout trainer. Born from wanting to learn a new layou
 
 ## Installation
 
-### Package Managers
-
-Coming soon.
-
 ### Pre-built Binaries
 
-Coming soon.
+Download the latest release for your platform from [GitHub Releases](https://github.com/jaeheonji/keydrill/releases/latest).
+
+Available for Linux (x86_64), macOS (x86_64, aarch64).
+
+### crates.io
+
+```sh
+cargo install keydrill
+```
 
 ### Build from Source
 
