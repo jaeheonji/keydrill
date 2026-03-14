@@ -4,6 +4,8 @@ version = "0.1.0"
 edition = "2024"
 authors = ["Jaeheon Ji <atx6419@gmail.com>"]
 description = "Keydrill — A terminal-based keyboard layout learning tool."
+license = "MIT"
+repository = "https://github.com/jaeheonji/keydrill"
 
 [dependencies]
 anyhow = "1"
@@ -18,3 +20,13 @@ clap = { version = "4.5.60", features = ["derive"] }
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.22", features = ["fmt", "env-filter"] }
 catppuccin = "2.7.0"
+
+[profile.dev]
+opt-level = 0
+debug = true
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+strip = true
+codegen-units = 1
