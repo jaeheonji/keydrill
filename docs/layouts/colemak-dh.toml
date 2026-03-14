@@ -1,4 +1,4 @@
-name = "Colemak-DH"
+name = "Colemak-DH (Advanced)"
 
 # Keys
 keys = [
@@ -54,75 +54,31 @@ keys = [
 
 # Levels
 [[levels]]
-name = "Home Row (Left)"
-new_keys = ["a", "r", "s", "t"]
-words = ["art", "rat", "star", "tart", "start", "sat", "tar", "at", "as", "a"]
-
-[[levels]]
-name = "Home Row (Right)"
-new_keys = ["n", "e", "i", "o"]
+name = "Home Row"
+new_keys = ["a", "r", "s", "t", "g", "m", "n", "e", "i", "o", "'"]
+word_count = 10
+random_words = false
 words = [
-    "ten", "net", "set", "rest", "nest", "test", "sent", "rent",
-    "in", "it", "its", "sit", "sin", "tin", "nine", "tie", "tire",
-    "site", "stein", "inert", "stern", "insert", "risen",
+    "art", "stone", "storm", "grain", "master",
+    "train", "roast", "morning", "moisten", "stern",
 ]
 
 [[levels]]
-name = "Home Row (Full)"
-new_keys = ["g", "m"]
+name = "Top Row"
+new_keys = ["q", "w", "f", "p", "b", "j", "l", "u", "y", ";"]
+word_count = 10
+random_words = false
 words = [
-    "game", "gate", "grain", "grant", "great", "grin", "grit", "grime",
-    "main", "man", "mast", "mate", "mean", "meet", "mine", "mint",
-    "mist", "more", "moisten", "name", "magnet", "margin", "might",
+    "quest", "wolf", "jungle", "simple", "tumble",
+    "purple", "fable", "young", "gentle", "swift",
 ]
 
 [[levels]]
-name = "Top Row (Left)"
-new_keys = ["q", "w", "f", "p", "b"]
+name = "Bottom Row"
+new_keys = ["z", "x", "c", "d", "v", "k", "h", ",", ".", "/"]
+word_count = 10
+random_words = false
 words = [
-    "want", "water", "wait", "was", "war", "wash", "what", "white",
-    "wide", "wife", "win", "with", "winter", "wish", "wire", "wise",
-    "fit", "first", "find", "fire", "fast", "far", "few", "free",
-    "fresh", "pant", "part", "past", "path", "pin", "pint", "print",
-    "quest", "quiet", "quit", "quite",
-    "ban", "bat", "best", "big", "bit", "born", "bone", "burn", "bring",
-]
-
-[[levels]]
-name = "Top Row (Right)"
-new_keys = ["j", "l", "u", "y"]
-words = [
-    "just", "jet", "jut", "jungle", "judge", "june",
-    "lift", "light", "line", "list", "little", "lung", "lust",
-    "until", "useful", "unit", "unique", "upper", "usual",
-    "yes", "yet", "yield",
-]
-
-[[levels]]
-name = "Bottom Row (Left)"
-new_keys = ["z", "x", "c", "d", "v"]
-words = [
-    "size", "zero", "zone", "zinc", "zest",
-    "next", "exist", "extra", "exact", "except", "exit", "context",
-    "citizen", "can", "cut", "cup", "cause", "cent", "center",
-    "certain", "chance", "change", "charge", "circle",
-    "dig", "dine", "dirt", "disc", "done", "drift", "dust",
-    "van", "vast", "visit", "vital", "give", "live", "ever", "even",
-]
-
-[[levels]]
-name = "Bottom Row (Right)"
-new_keys = ["k", "h"]
-words = [
-    "king", "kind", "keep", "knee", "kill", "kit", "kitchen", "kick",
-    "the", "that", "this", "then", "than", "their", "there", "these",
-    "thin", "hand", "hard", "head", "heat", "hint", "hit", "his",
-]
-
-[[levels]]
-name = "Punctuation"
-new_keys = [",", ".", "/", ";", "'"]
-words = [
-    "it's", "that's", "there's", "what's", "can't",
-    "didn't", "don't", "isn't", "hasn't", "won't",
+    "check", "quick", "kitchen", "exchange", "sketch",
+    "discover", "advance", "thick", "unlock", "driven",
 ]
